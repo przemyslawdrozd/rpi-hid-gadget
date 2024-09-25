@@ -1,8 +1,8 @@
 import asyncio
 import websockets
 import logging
-from Utils import Utils
 from consts import PORT, LOG_FORMATTING, WS_ERROR_TIMEOUT
+from Utils import Utils
 
 
 class HIDController:
@@ -25,7 +25,7 @@ class HIDController:
                 await self.__connect()
                 await self.__listen_for_messages()
             except Exception as e:
-                self.logger.error(f"Error: {e}. Retrying in 5 seconds...")
+                self.logger.error(f"Error: {e}. Retrying in {WS_ERROR_TIMEOUT} seconds...")
                 await asyncio.sleep(WS_ERROR_TIMEOUT)  # Wait before attempting to reconnect
 
     async def __connect(self):

@@ -1,7 +1,7 @@
 import time
 import random
-from HIDKeyMap import HID_KEY_MAP
-from consts import SERIAL_PORT, SLEEP_TIME_RANGE
+from src.HIDKeyMap import HID_KEY_MAP
+from src.consts import SERIAL_PORT, SLEEP_TIME_RANGE
 
 
 class Utils:
