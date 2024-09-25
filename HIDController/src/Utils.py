@@ -1,6 +1,8 @@
 import random
 import asyncio
 import logging
+import aiofiles
+
 from HIDKeyMap import HID_KEY_MAP
 from consts import SERIAL_PORT, SLEEP_TIME_RANGE, LOGGER_NAME
 
@@ -18,13 +20,14 @@ class Utils:
             Utils.write_report(encoded_char)
             await Utils.random_sleep()
 
-        Utils.write_report("Release")
+        logger.debug("Release..")
+        await Utils.write_report("Release")
 
     @staticmethod
-    def write_report(report: str) -> None:
-        """Write give value into serial port"""
-        # with open(SERIAL_PORT, "rb+") as fd:
-        #     fd.write(report.encode())
+    async def write_report(report: str) -> None:
+        """Asynchronously write the given value into serial port"""
+        async with aiofiles.open(SERIAL_PORT, "rb+") as fd:
+            await fd.write(report.encode())
 
     @staticmethod
     def get_report_value(char: str):
