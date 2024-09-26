@@ -8,9 +8,9 @@ import time
 sys.path.append(os.path.join(os.path.dirname(__file__), 'src'))
 
 from src.HIDController import HIDController
-from src.consts import WS_PREFIX, LOG_FORMATTING
+from src.consts import WS_PREFIX, LOGGER_NAME, LOG_FORMATTING
 
-logger = logging.getLogger("HIDController")
+logger = logging.getLogger(LOGGER_NAME)
 
 
 def set_logger():
