@@ -1,8 +1,12 @@
 import asyncio
+import logging
+
 import websockets
 
 PORT = 8760
 HOST = "0.0.0.0"
+
+
 class WSServer:
     def __init__(self):
         self.host = HOST
@@ -27,15 +31,11 @@ class WSServer:
         while True:
             if self.connected_clients:  # If there are any connected clients
 
-                NULL_CHAR = chr(0)
+                instructions: [str] = ["a", "b"]
 
-                message = "A"
-
-                print("encoded message F1", )
-                print("Broadcasting message to all clients")
-
-
-                tasks = [asyncio.create_task(client.send(message)) for client in self.connected_clients]
+                logging.info(f"Send instructions {instructions}")
+                print("elko", instructions)
+                tasks = [asyncio.create_task(client.send(instructions)) for client in self.connected_clients]
                 await asyncio.wait(tasks)
             await asyncio.sleep(1)  # Send message every 1 second
 

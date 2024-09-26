@@ -2,14 +2,30 @@ import os
 import sys
 import asyncio
 import logging
+import time
 
 """To fix ModuleNotFoundError from src files"""
 sys.path.append(os.path.join(os.path.dirname(__file__), 'src'))
 
 from src.HIDController import HIDController
-from src.consts import WS_PREFIX
+from src.consts import WS_PREFIX, LOG_FORMATTING
+
+logger = logging.getLogger("HIDController")
+
+
+def set_logger():
+    logger.setLevel(logging.DEBUG)
+    stream_handler = logging.StreamHandler(sys.stdout)
+    formatter = logging.Formatter(LOG_FORMATTING)
+    formatter.converter = time.gmtime
+    stream_handler.setLevel(logging.DEBUG)
+    stream_handler.setFormatter(formatter)
+    logger.addHandler(stream_handler)
+    logger.parent = False
+
 
 if __name__ == "__main__":
+    set_logger()
     logging.info("Start script")
 
     args = sys.argv[1:]
