@@ -17,7 +17,7 @@ class Utils:
             logger.debug(f"Iter {char}")
             encoded_char = Utils.get_report_value(char)
             logger.debug("Found encoded_char")
-            Utils.write_report(encoded_char)
+            await Utils.write_report(encoded_char)
             await Utils.random_sleep()
 
         logger.debug("Release..")
