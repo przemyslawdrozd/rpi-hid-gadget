@@ -1,5 +1,5 @@
 WS_PREFIX = "192.168.0"
-PORT = 8760
+PORT = 8765
 WS_ERROR_TIMEOUT = 5  # Second
 
 SERIAL_PORT = "/dev/hidg0"

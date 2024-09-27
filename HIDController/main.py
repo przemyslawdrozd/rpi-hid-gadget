@@ -8,9 +8,9 @@ import time
 sys.path.append(os.path.join(os.path.dirname(__file__), 'src'))
 
 from src.HIDController import HIDController
-from src.consts import WS_PREFIX, LOG_FORMATTING
+from src.consts import WS_PREFIX, LOGGER_NAME, LOG_FORMATTING
 
-logger = logging.getLogger("HIDController")
+logger = logging.getLogger(LOGGER_NAME)
 
 
 def set_logger():
@@ -31,7 +31,7 @@ if __name__ == "__main__":
     args = sys.argv[1:]
     ws_url_suffix = args[0]
     ws_url = f"{WS_PREFIX}.{ws_url_suffix}"
-
+    logger.info(f"Connect to {ws_url}")
     hid_controller = HIDController(ws_url)
 
     # Start the event loop

@@ -1,4 +1,6 @@
 import asyncio
+import json
+
 import websockets
 import logging
 from consts import PORT, LOGGER_NAME, WS_ERROR_TIMEOUT
@@ -36,8 +38,8 @@ class HIDController:
         while True:
             try:
                 instructions = await self.websocket.recv()
-                await Utils.handle_write_report(instructions)
 
+                await Utils.handle_write_report(json.loads(instructions))
                 logger.info(f"Applied instructions {instructions}")
 
             except websockets.ConnectionClosed:
