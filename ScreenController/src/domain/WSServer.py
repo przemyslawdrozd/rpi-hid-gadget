@@ -37,11 +37,10 @@ class WSServer:
         """Broadcast a periodic message to the connected client."""
         # while True:
         if self.connected_client:  # If there's a connected client
-            logging.info(f"Send instructions {instructions}")
-            logger.info(f"elko {instructions}")
             try:
                 await self.connected_client.send(json.dumps(instructions))
             except websockets.exceptions.ConnectionClosed:
+                logger.error("WS failed to broadcast_message")
                 self.connected_client = None
         await asyncio.sleep(.1)  # Send message every 1 second
 

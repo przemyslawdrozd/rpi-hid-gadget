@@ -1,14 +1,12 @@
-import logging
-from io import BytesIO
-from .FragmentScreenTaker import FragmentScreenTaker
-from .HealthBar import HealthBar
+from ..utils.FragmentScreenTaker import FragmentScreenTaker
+from ..utils.HealthBar import HealthBar
 
 
 class ScreenHandler:
     def __init__(self):
         """
         Initialize the ScreenHandler with a FragmentScreenTaker instance.
-        :param fragment_screentaker: Instance of FragmentScreenTaker used for taking screenshots.
+        :param fragment screen-taker: Instance of FragmentScreenTaker used for taking screenshots.
         """
         self.fragment_screentaker = FragmentScreenTaker()
         self.health_bar = HealthBar()
