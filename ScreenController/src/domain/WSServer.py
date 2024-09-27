@@ -1,10 +1,13 @@
 import asyncio
+import json
 import logging
-import websockets
 
+import websockets
+from ..consts import LOGGER_NAME
 PORT = 8760
 HOST = "0.0.0.0"
 
+logger = logging.getLogger(LOGGER_NAME)
 
 class WSServer:
     def __init__(self):
@@ -30,21 +33,19 @@ class WSServer:
             # Unregister the client on disconnection
             self.connected_client = None
 
-    async def broadcast_message(self):
+    async def broadcast_message(self, instructions):
         """Broadcast a periodic message to the connected client."""
-        while True:
-            if self.connected_client:  # If there's a connected client
-                instructions = ["a", "b"]
-                logging.info(f"Send instructions {instructions}")
-                print("elko", instructions)
-                try:
-                    await self.connected_client.send(instructions)
-                except websockets.exceptions.ConnectionClosed:
-                    self.connected_client = None
-            await asyncio.sleep(1)  # Send message every 1 second
+        # while True:
+        if self.connected_client:  # If there's a connected client
+            logging.info(f"Send instructions {instructions}")
+            logger.info(f"elko {instructions}")
+            try:
+                await self.connected_client.send(json.dumps(instructions))
+            except websockets.exceptions.ConnectionClosed:
+                self.connected_client = None
+        await asyncio.sleep(.1)  # Send message every 1 second
 
     async def start_server(self):
-        """Start the WebSocket server and run the broadcast message task."""
+        """Start the WebSocket server."""
         self.server = await websockets.serve(self.handle_client, self.host, self.port)
         print(f"WebSocket server started at ws://{self.host}:{self.port}")
-        await self.broadcast_message()
