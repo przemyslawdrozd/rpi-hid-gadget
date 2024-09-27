@@ -8,7 +8,8 @@ logger = logging.getLogger(LOGGER_NAME)
 
 
 class FragmentScreenTaker:
-    def __init__(self, left=400, top=100, width=360, height=80):
+    
+    def __init__(self, left=800, top=53, width=360, height=7):
         """
         Initialize the region of the screen to capture.
         Args:

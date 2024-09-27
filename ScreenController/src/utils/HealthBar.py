@@ -3,7 +3,7 @@ import numpy as np
 from PIL import Image
 from io import BytesIO
 
-BAR_PREFIX = 37
+BAR_PREFIX = 66
 
 
 class HealthBar:

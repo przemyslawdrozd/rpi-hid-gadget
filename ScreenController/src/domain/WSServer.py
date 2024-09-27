@@ -4,7 +4,7 @@ import logging
 
 import websockets
 from ..consts import LOGGER_NAME
-PORT = 8760
+PORT = 8765
 HOST = "0.0.0.0"
 
 logger = logging.getLogger(LOGGER_NAME)
@@ -42,7 +42,7 @@ class WSServer:
             except websockets.exceptions.ConnectionClosed:
                 logger.error("WS failed to broadcast_message")
                 self.connected_client = None
-        await asyncio.sleep(.1)  # Send message every 1 second
+        await asyncio.sleep(1)  # Send message every 1 second
 
     async def start_server(self):
         """Start the WebSocket server."""
