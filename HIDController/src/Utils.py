@@ -18,6 +18,11 @@ class Utils:
             encoded_char = Utils.get_report_value(char)
             logger.debug("Found encoded_char")
             await Utils.write_report(encoded_char)
+
+            if char.startswith("a_"):
+                logger.debug("Found arrow sleep longer..")
+                await asyncio.sleep(2)
+                
             await Utils.random_sleep()
 
         logger.debug("Release..")
@@ -40,4 +45,3 @@ class Utils:
         sleep_time = random.uniform(*SLEEP_TIME_RANGE)
         logger.debug(f"sleep_time: {sleep_time}")
         await asyncio.sleep(sleep_time)
-
