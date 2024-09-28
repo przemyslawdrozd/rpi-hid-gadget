@@ -3,6 +3,7 @@ import sys
 import asyncio
 import logging
 import time
+import atexit
 
 """To fix ModuleNotFoundError from src files"""
 sys.path.append(os.path.join(os.path.dirname(__file__), 'src'))
@@ -33,6 +34,9 @@ if __name__ == "__main__":
     ws_url = f"{WS_PREFIX}.{ws_url_suffix}"
     logger.info(f"Connect to {ws_url}")
     hid_controller = HIDController(ws_url)
+
+    # Register the function to run when the script exits
+    atexit.register(HIDController.on_exit())
 
     # Start the event loop
     asyncio.get_event_loop().run_until_complete(hid_controller.start())

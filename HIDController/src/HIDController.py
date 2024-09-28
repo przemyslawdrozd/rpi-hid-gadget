@@ -48,3 +48,9 @@ class HIDController:
             except Exception as e:
                 logger.error(f"Error while receiving message: {e}")
                 break
+
+    @staticmethod
+    def on_exit():
+        logger.info("Script is closing, running the exit command...")
+        Utils.handle_write_report(["Release"])
+        logger.info("Key Released..")
