@@ -31,10 +31,10 @@ class ScreenHandler:
         health_bar_res = self.health_bar.calculate_red_bar_percentage(health_bar_buffer)
 
         radar_cords = {
-            'L': 995,
-            'T': 170,
-            'W': 90,
-            'H': 90
+            'L': 1514,
+            'T': 83,
+            'W': 120,
+            'H': 120
         }
         radar_status_buffer = self.fst.take_screenshot_in_memory(radar_cords)
 
@@ -47,10 +47,10 @@ class ScreenHandler:
         logger.debug(f"direction {direction}")
 
         target_name_cords = {
-            'L': 420,
-            'T': 70,
-            'W': 360,
-            'H': 40
+            'L': 850,
+            'T': 30,
+            'W': 250,
+            'H': 25
         }
 
         target_name_buffer = self.fst.take_screenshot_in_memory(target_name_cords)

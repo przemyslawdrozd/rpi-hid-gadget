@@ -3,10 +3,14 @@ class HIDMapper:
         self.history = []
 
     def generate_instructions(self, data) -> [str]:
-        self.history.append(data)
+        self.history.insert(0, data)
 
-        if data['target_name'] is None:
-            return ['a_up']
+        if len(self.history) > 5:
+            self.history = self.history[:5]
+
+
+        if data['target_name'] == "" :
+            return ['a_up', 'F1']
 
         if data["health_bar"] > 1:
             return ["F2"]
@@ -16,3 +20,4 @@ class HIDMapper:
         for char in instructions:
             if char.startswith("a_"):
                 return 2
+        return 0
