@@ -8,22 +8,8 @@ logger = logging.getLogger(LOGGER_NAME)
 
 
 class FragmentScreenTaker:
-    
-    def __init__(self, left=800, top=53, width=360, height=7):
-        """
-        Initialize the region of the screen to capture.
-        Args:
-            left (int): X-coordinate of the top-left corner of the region.
-            top (int): Y-coordinate of the top-left corner of the region.
-            width (int): Width of the region.
-            height (int): Height of the region.
-        """
-        self.left = left
-        self.top = top
-        self.width = width
-        self.height = height
 
-    def take_screenshot_in_memory(self) -> BytesIO:
+    def take_screenshot_in_memory(self, cords: dir) -> BytesIO:
         """
         Takes a screenshot of a specified region and returns it as an in-memory BytesIO object.
 
@@ -35,8 +21,13 @@ class FragmentScreenTaker:
         # Measure the start time
         start_time = time.time()
 
+        left = cords['L']
+        top = cords['T']
+        width = cords['W']
+        height = cords['H']
+
         # Take a screenshot of the specified region (but do not save it)
-        screenshot = pyautogui.screenshot(region=(self.left, self.top, self.width, self.height))
+        screenshot = pyautogui.screenshot(region=(left, top, width, height))
 
         # Save screenshot
         # screenshot.save(f"save_{start_time}.png")
