@@ -5,8 +5,8 @@ WS_ERROR_TIMEOUT = 5  # Second
 SERIAL_PORT = "/dev/hidg0"
 
 # Constants for random sleep duration
-MIN_SLEEP_TIME = 0.05  # 50 milliseconds
-MAX_SLEEP_TIME = 0.1  # 50 milliseconds
+MIN_SLEEP_TIME = 0.01  # 10 milliseconds
+MAX_SLEEP_TIME = 0.05  # 50 milliseconds
 SLEEP_TIME_RANGE = (MIN_SLEEP_TIME, MAX_SLEEP_TIME)
 
 LOGGER_NAME = "HIDController"

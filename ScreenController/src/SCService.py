@@ -43,6 +43,12 @@ class SCService:
 
             await self.ws_client.broadcast_message(instructions)
 
+            control_sleep = self.hid_mapper.analise_instructions(instructions)
+            
+            if control_sleep != 0:
+                logger.debug("Found arrow instruction")
+                await asyncio.sleep(control_sleep)
+
             exec_time = time.perf_counter() - start_time
 
             # Calculate remaining time to make loop execution 1 second

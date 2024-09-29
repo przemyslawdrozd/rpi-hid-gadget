@@ -48,3 +48,10 @@ class HIDController:
             except Exception as e:
                 logger.error(f"Error while receiving message: {e}")
                 break
+
+    @staticmethod
+    async def on_exit():
+        loop = asyncio.get_event_loop()
+        logger.info("Script is closing, running the exit command...")
+        loop.run_until_complete(Utils.handle_write_report(["Release"]))
+        logger.info("Key Released..")
