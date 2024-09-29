@@ -30,20 +30,27 @@ class ScreenHandler:
         health_bar_buffer = self.fst.take_screenshot_in_memory(health_cords)
         health_bar_res = self.health_bar.calculate_red_bar_percentage(health_bar_buffer)
 
-        radar_cords = {
-            'L': 1514,
-            'T': 83,
-            'W': 120,
-            'H': 120
+        radar_targets_cords = {
+            'L': 1472,
+            'T': 40,
+            'W': 200,
+            'H': 200
         }
-        radar_status_buffer = self.fst.take_screenshot_in_memory(radar_cords)
-
-        radar_status_image = self.radar_status.load_image(radar_status_buffer)
-
-        target_dots = self.radar_status.count_red_dots(radar_status_image)
+        radar_targets_buffer = self.fst.take_screenshot_in_memory(radar_targets_cords)
+        radar_targets_image = self.radar_status.load_image(radar_targets_buffer)
+        target_dots = self.radar_status.count_red_dots(radar_targets_image)
         logger.debug(f"target_dots {target_dots}")
 
-        direction = self.radar_status.determine_direction_based_on_rectangle(radar_status_image)
+        
+        radar__direction_cords = {
+            'L': 1545,
+            'T': 113,
+            'W': 60,
+            'H': 60
+        }
+        radar_direction_buffer = self.fst.take_screenshot_in_memory(radar__direction_cords)
+        radar_direction_image = self.radar_status.load_image(radar_direction_buffer)
+        direction = self.radar_status.determine_direction_based_on_rectangle(radar_direction_image)
         logger.debug(f"direction {direction}")
 
         target_name_cords = {

@@ -36,7 +36,7 @@ if __name__ == "__main__":
     hid_controller = HIDController(ws_url)
 
     # Register the function to run when the script exits
-    atexit.register(HIDController.on_exit())
+    atexit.register(HIDController.on_exit)
 
     # Start the event loop
     asyncio.get_event_loop().run_until_complete(hid_controller.start())

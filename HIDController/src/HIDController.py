@@ -50,7 +50,8 @@ class HIDController:
                 break
 
     @staticmethod
-    def on_exit():
+    async def on_exit():
+        loop = asyncio.get_event_loop()
         logger.info("Script is closing, running the exit command...")
-        Utils.handle_write_report(["Release"])
+        loop.run_until_complete(Utils.handle_write_report(["Release"]))
         logger.info("Key Released..")

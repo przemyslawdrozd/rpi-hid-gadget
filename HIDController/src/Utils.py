@@ -19,10 +19,16 @@ class Utils:
             logger.debug("Found encoded_char")
             await Utils.write_report(encoded_char)
 
-            if char.startswith("a_"):
-                logger.debug("Found arrow sleep longer..")
+
+            if char == "a_up" or char == "a_down":
+                logger.debug("Found arrow up/down sleep 2 sec..")
                 await asyncio.sleep(2)
-                
+
+            if char == "a_right" or char == "a_left":
+                logger.debug("Found arrow up/down sleep 1 sec..")
+                await asyncio.sleep(1)
+            
+            await Utils.write_report("Release")
             await Utils.random_sleep()
 
         logger.debug("Release..")

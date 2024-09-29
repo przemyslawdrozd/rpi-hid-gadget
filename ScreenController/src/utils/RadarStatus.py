@@ -1,11 +1,11 @@
 import cv2
 import numpy as np
 from io import BytesIO
-
+import math
 
 class RadarStatus:
 
-    def load_image(self, img_byte_arr):
+    def load_image(self, img_byte_arr) -> BytesIO:
         """
         Convert BytesIO object to a numpy array and decode into an image.
         Returns:
@@ -20,7 +20,7 @@ class RadarStatus:
         """
         Determine the direction of the yellow triangle (representing direction) in the image.
         Returns:
-            direction (str): The direction ('N', 'S', 'E', 'W', 'NE', 'SE', 'SW', 'NW') or None if no triangle found.
+            direction (float): The direction in degrees (0-360) or None if no triangle found.
         """
         height, width, _ = image.shape
         image_center = (width // 2, height // 2)
@@ -45,41 +45,32 @@ class RadarStatus:
             box = cv2.boxPoints(rect)
             box = np.int32(box)
 
-            # Calculate the center of the bounding rectangle (green box)
+            # Calculate the center of the bounding rectangle
             rect_center_x = int(np.mean([point[0] for point in box]))
             rect_center_y = int(np.mean([point[1] for point in box]))
 
-            # Compare the bounding box center with the image center
-            direction = self._determine_quadrant((rect_center_x, rect_center_y), image_center)
-            print(f'Triangle is located towards: {direction}')
-            return direction
+            # Determine direction based on the angle between the centers
+            direction_in_degrees = self._calculate_angle_in_degrees((rect_center_x, rect_center_y), image_center)
+            print(f'Triangle is located towards: {direction_in_degrees:.2f} degrees')
+            return direction_in_degrees
         else:
             print("No triangle found.")
             return None
 
-    def _determine_quadrant(self, rect_center, image_center):
+    def _calculate_angle_in_degrees(self, rect_center, image_center):
         rect_x, rect_y = rect_center
         image_center_x, image_center_y = image_center
 
-        vertical_threshold = 5
-        horizontal_threshold = 5
+        # Calculate the angle in radians between the two points
+        angle_radians = math.atan2(rect_y - image_center_y, rect_x - image_center_x)
 
-        if abs(rect_x - image_center_x) < horizontal_threshold and rect_y < image_center_y:
-            return "N"
-        elif abs(rect_x - image_center_x) < horizontal_threshold and rect_y > image_center_y:
-            return "S"
-        elif rect_x > image_center_x and abs(rect_y - image_center_y) < vertical_threshold:
-            return "E"
-        elif rect_x > image_center_x and rect_y < image_center_y:
-            return "NE"
-        elif rect_x > image_center_x and rect_y > image_center_y:
-            return "SE"
-        elif rect_x < image_center_x and abs(rect_y - image_center_y) < vertical_threshold:
-            return "W"
-        elif rect_x < image_center_x and rect_y < image_center_y:
-            return "NW"
-        elif rect_x < image_center_x and rect_y > image_center_y:
-            return "SW"
+        # Convert the angle from radians to degrees
+        angle_degrees = math.degrees(angle_radians)
+
+        # Adjust the angle to make "North" (upward) be 0 degrees and go clockwise
+        angle_degrees = (angle_degrees + 90) % 360
+
+        return int(angle_degrees)
 
     def count_red_dots(self, image):
         """
