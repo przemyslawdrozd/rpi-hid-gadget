@@ -42,15 +42,16 @@ class ScreenHandler:
         logger.debug(f"target_dots {target_dots}")
 
         
-        radar__direction_cords = {
+        radar_direction_cords = {
             'L': 1545,
             'T': 113,
             'W': 60,
             'H': 60
         }
-        radar_direction_buffer = self.fst.take_screenshot_in_memory(radar__direction_cords)
-        radar_direction_image = self.radar_status.load_image(radar_direction_buffer)
-        direction = self.radar_status.determine_direction_based_on_rectangle(radar_direction_image)
+        radar_direction_buffer = self.fst.take_screenshot_in_memory(radar_direction_cords)
+        # radar_direction_image = self.radar_status.load_image(radar_direction_buffer)
+        direction = self.radar_status.predict_direction_from_bytes(radar_direction_buffer)
+        # direction = 0
         logger.debug(f"direction {direction}")
 
         target_name_cords = {

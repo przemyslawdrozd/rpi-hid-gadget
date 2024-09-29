@@ -2,8 +2,13 @@ import cv2
 import numpy as np
 from io import BytesIO
 import math
+from PIL import Image
+from tensorflow.keras.models import load_model
 
 class RadarStatus:
+
+    def __init__(self):
+        self.model = load_model("angle_classification_model.h5")
 
     def load_image(self, img_byte_arr) -> BytesIO:
         """
@@ -15,6 +20,43 @@ class RadarStatus:
         np_arr = np.frombuffer(img_byte_arr.getvalue(), np.uint8)
         image = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
         return image
+
+    def load_and_preprocess_image_from_bytes(self, img_byte_arr):
+        """
+        Convert a BytesIO image to a numpy array and preprocess it for model input.
+
+        Args:
+            img_byte_arr (BytesIO): The image in memory.
+
+        Returns:
+            np.array: The preprocessed image ready for model prediction.
+        """
+        img_byte_arr.seek(0)  # Reset the stream position to the beginning
+        img = Image.open(img_byte_arr).convert('RGB')  # Open image and convert to RGB
+        img = img.resize((60, 60))  # Resize to 60x60 as expected by the model
+        img_array = np.array(img) / 255.0  # Normalize pixel values to [0, 1]
+        img_array = np.expand_dims(img_array, axis=0)  # Add batch dimension
+        return img_array
+
+    def predict_direction_from_bytes(self, img_byte_arr):
+        """
+        Predict the direction angle from the screenshot (BytesIO).
+
+        Args:
+            img_byte_arr (BytesIO): The screenshot in memory.
+
+        Returns:
+            int: The predicted angle.
+        """
+        # Preprocess the image
+        img_array = self.load_and_preprocess_image_from_bytes(img_byte_arr)
+
+        # Make a prediction
+        prediction = self.model.predict(img_array)
+        direction_label = np.argmax(prediction)  # Get the class with the highest score
+
+        # Convert the label back to the corresponding angle
+        return direction_label * 10  # Label 0 corresponds to 0 degrees, 1 to 10 degrees, etc.
 
     def determine_direction_based_on_rectangle(self, image):
         """

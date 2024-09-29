@@ -2,3 +2,6 @@
 .idea
 __pycache__/
 *.pyc
+TestScripts/radar/radar_v2/radar_data/data_lake/
+
+TestScripts/radar/radar_v2/radar_data/training_data/
