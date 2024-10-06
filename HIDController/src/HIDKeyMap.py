@@ -10,6 +10,16 @@ HID_KEY_MAP = {
 
     "F1": (NULL_CHAR * 2 + chr(58) + NULL_CHAR * 5),
     "F2": (NULL_CHAR * 2 + chr(59) + NULL_CHAR * 5),
+    "F3": (NULL_CHAR * 2 + chr(60) + NULL_CHAR * 5),
+    "F4": (NULL_CHAR * 2 + chr(61) + NULL_CHAR * 5),
+    "F5": (NULL_CHAR * 2 + chr(62) + NULL_CHAR * 5),
+    "F6": (NULL_CHAR * 2 + chr(63) + NULL_CHAR * 5),
+    "F7": (NULL_CHAR * 2 + chr(64) + NULL_CHAR * 5),
+    "F8": (NULL_CHAR * 2 + chr(65) + NULL_CHAR * 5),
+    "F9": (NULL_CHAR * 2 + chr(66) + NULL_CHAR * 5),
+    "F10": (NULL_CHAR * 2 + chr(67) + NULL_CHAR * 5),
+    "F11": (NULL_CHAR * 2 + chr(68) + NULL_CHAR * 5),
+    "F12": (NULL_CHAR * 2 + chr(69) + NULL_CHAR * 5),
 
     "a_up": (NULL_CHAR * 2 + chr(82) + NULL_CHAR * 5),
     "a_down": (NULL_CHAR * 2 + chr(81) + NULL_CHAR * 5),
