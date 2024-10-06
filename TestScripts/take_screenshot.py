@@ -5,25 +5,27 @@ from PIL import Image
 import pytesseract
 import re
 from io import BytesIO
-from health_bar import calculate_red_bar_percentage
+from health_bar import calculate_red_bar_percentage, HealthBar
 # Set up logging configuration
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-
+health_bar = HealthBar()
 def take_screenshot_in_memory():
     logging.info("Starting screenshot process...")
 
     # Measure the start time
     start_time = time.time()
 
-    left = 380  # X-coordinate of the top-left corner of the region
-    top = 70  # Y-coordinate of the top-left corner of the region
-    width = 350  # Width of the region
-    height = 60  # Height of the region
+    left = 400  # X-coordinate of the top-left corner of the region
+    top = 100  # Y-coordinate of the top-left corner of the region
+    width = 360  # Width of the region
+    height = 80  # Height of the region
 
     # Take a screenshot (but do not save it)
     screenshot = pyautogui.screenshot(region=(left, top, width, height))
-    screenshot.save(f"save_{start_time}.png")
+
+    # Save screenshot
+    # screenshot.save(f"save_{start_time}.png")
 
     # Measure the time after taking the screenshot
     screenshot_time = time.time()
@@ -33,8 +35,9 @@ def take_screenshot_in_memory():
     img_byte_arr = BytesIO()
     screenshot.save(img_byte_arr, format='PNG')
 
-    res = calculate_red_bar_percentage(img_byte_arr)
-    print("bar heal", res)
+    # approx_target_hp = calculate_red_bar_percentage(img_byte_arr)
+    approx_target_hp = health_bar.calculate_red_bar_percentage(img_byte_arr)
+    print("approx_target_hp", approx_target_hp)
     # Rewind the buffer to the beginning, so it can be read
     img_byte_arr.seek(0)
 
@@ -90,17 +93,17 @@ process_start_time = time.time()
 
 # Take a screenshot and keep it in memory
 screenshot_in_memory = take_screenshot_in_memory()
-
-# Extract text from the in-memory screenshot
-extracted_text = extract_text_from_image_in_memory(screenshot_in_memory)
-
-# Check if the target is killed based on the pattern
-is_target_killed = find_is_target_killed(extracted_text)
-logging.info(f"Is the target killed: {is_target_killed}")
-
-# Measure total execution time
-process_end_time = time.time()
-logging.info(f"Total process completed in {process_end_time - process_start_time:.4f} seconds.")
-
-# Print result for final output
-print("is_target_killed", is_target_killed)
+#
+# # Extract text from the in-memory screenshot
+# extracted_text = extract_text_from_image_in_memory(screenshot_in_memory)
+#
+# # Check if the target is killed based on the pattern
+# is_target_killed = find_is_target_killed(extracted_text)
+# logging.info(f"Is the target killed: {is_target_killed}")
+#
+# # Measure total execution time
+# process_end_time = time.time()
+# logging.info(f"Total process completed in {process_end_time - process_start_time:.4f} seconds.")
+#
+# # Print result for final output
+# print("is_target_killed", is_target_killed)

@@ -4,7 +4,7 @@ NULL_CHAR = chr(0)
 time.sleep(2)
 
 
-def write_report(report: str) -> None:
+def write_report(report) -> None:
     time.sleep(0.2)
     with open('/dev/hidg0', 'rb+') as fd:
         fd.write(report.encode())

@@ -3,5 +3,7 @@
 __pycache__/
 *.pyc
 TestScripts/radar/radar_v2/radar_data/data_lake/
-
+*.png
+*.csv
+*.DS_Store
 TestScripts/radar/radar_v2/radar_data/training_data/
