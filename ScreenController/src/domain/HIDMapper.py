@@ -1,5 +1,9 @@
+from ..utils.ActiveSkill import ActiveSkill
+
+
 class HIDMapper:
     def __init__(self):
+        self.active_skill = ActiveSkill()
         self.history = []
         self.directions_map = {
             'NE': 45,
@@ -9,6 +13,10 @@ class HIDMapper:
         }
 
     def generate_instructions(self, data) -> [str]:
+
+        if self.active_skill.check_interval():
+            return ["F5", "F6"]
+
         self.history.insert(0, data)
 
         if len(self.history) > 5:
@@ -23,12 +31,13 @@ class HIDMapper:
             return ["F2"]
         return ["F1", "F2"]
 
-    def analise_instructions(self, instructions: [str]):
+    @staticmethod
+    def analise_instructions(instructions: [str]):
         for char in instructions:
             if char.startswith("a_"):
                 return 2
         return 0
-    
+
     def _calculate_direction(self, data):
         target_dots = data['target_dots']
         current_direction = data['direction']
@@ -58,5 +67,3 @@ class HIDMapper:
                 return ["a_left", "a_up"]  # Turn left if the difference is greater than 180 degrees
             else:
                 return ["a_right", "a_up"]  # Turn right if the difference is less than or equal to 180 degrees
-
-

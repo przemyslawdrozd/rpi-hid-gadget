@@ -29,7 +29,8 @@ class SCService:
 
         instructions = self.hid_mapper.generate_instructions(screen_data)
         logger.debug(f"Created instructions: {instructions}")
-        # data = ["F1", "F2"]
+
+
 
         return instructions
 
