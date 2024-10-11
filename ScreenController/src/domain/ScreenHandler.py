@@ -63,14 +63,14 @@ class ScreenHandler:
         target_name_res = self.target_name.extract_text_from_image(target_name_buffer)
         logger.debug(f"target_name_res {target_name_res}")
 
-        char_status_bar_cords = {
-            'L': 350,
-            'T': 30,
-            'W': 250,
-            'H': 25
+        cp_bar_cords = {
+            'L': 200,
+            'T': 60,
+            'W': 175,
+            'H': 8
         }
 
-        cp_bar_buffer = self.fst.take_screenshot_in_memory(char_status_bar_cords)
+        cp_bar_buffer = self.fst.take_screenshot_in_memory(cp_bar_cords)
         cp_bar_data = self.cp_bar.calculate_percentage(cp_bar_buffer)
 
         return {

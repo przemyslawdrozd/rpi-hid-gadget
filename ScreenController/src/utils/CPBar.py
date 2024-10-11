@@ -5,6 +5,8 @@ from io import BytesIO
 import pygame
 
 
+CP_PREFIX = 130
+
 class CPBar:
     def __init__(self):
         self.lower_orange = np.array([5, 50, 50])  # Lower bound for orange hue
@@ -32,7 +34,7 @@ class CPBar:
         # Calculate the percentage of orange pixels
         orange_pixels = cv2.countNonZero(mask)
         total_pixels = image.shape[0] * image.shape[1]
-        percentage = (orange_pixels / total_pixels) * 100
+        percentage = int((orange_pixels / total_pixels) * CP_PREFIX)
 
         if percentage < 100:
             self.__invoke_alert()
