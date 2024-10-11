@@ -30,8 +30,6 @@ class SCService:
         instructions = self.hid_mapper.generate_instructions(screen_data)
         logger.debug(f"Created instructions: {instructions}")
 
-
-
         return instructions
 
     async def handle_broadcast_loop(self):
@@ -42,10 +40,12 @@ class SCService:
             instructions = await self.get_instructions()
             logger.debug(f"Broadcasting instructions: {instructions}")
 
+
+
             await self.ws_client.broadcast_message(instructions)
 
             control_sleep = self.hid_mapper.analise_instructions(instructions)
-            
+
             if control_sleep != 0:
                 logger.debug("Found arrow instruction")
                 await asyncio.sleep(control_sleep)

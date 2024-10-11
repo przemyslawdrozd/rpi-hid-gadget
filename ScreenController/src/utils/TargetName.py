@@ -1,7 +1,5 @@
-import time
-import logging
-from PIL import Image
 import pytesseract
+from PIL import Image
 from io import BytesIO
 
 
