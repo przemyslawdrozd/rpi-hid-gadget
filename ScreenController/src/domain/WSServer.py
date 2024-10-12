@@ -4,10 +4,12 @@ import logging
 
 import websockets
 from ..consts import LOGGER_NAME
+
 PORT = 8765
 HOST = "0.0.0.0"
 
 logger = logging.getLogger(LOGGER_NAME)
+
 
 class WSServer:
     def __init__(self):

@@ -1,4 +1,5 @@
 import logging
+import argparse
 
 from ..utils.FragmentScreenTaker import FragmentScreenTaker
 from ..utils.HealthBar import HealthBar
@@ -13,12 +14,13 @@ logger = logging.getLogger(LOGGER_NAME)
 
 
 class ScreenHandler:
-    def __init__(self):
+    def __init__(self, args: argparse.Namespace):
         """
         Initialize the ScreenHandler with a FragmentScreenTaker instance.
         :param fragment screen-taker: Instance of FragmentScreenTaker used for taking screenshots.
         """
-        self.fst = FragmentScreenTaker()
+        self.args = args
+        self.fst = FragmentScreenTaker(args)
         self.health_bar = HealthBar()
         self.radar_status = RadarStatus()
         self.target_name = TargetName()
@@ -27,27 +29,26 @@ class ScreenHandler:
         self.anti = Anti()
 
     def aggregate_screen_data(self) -> dict:
-
-        health_bar_buffer = self.fst.take_screenshot_in_memory(CORDS["HEALTH"])
+        health_bar_buffer = self.fst.take_screenshot_in_memory("health", CORDS["HEALTH"])
         health_bar_res = self.health_bar.calculate_red_bar_percentage(health_bar_buffer)
 
-        radar_targets_buffer = self.fst.take_screenshot_in_memory(CORDS["RADAR_TARGETS"])
+        radar_targets_buffer = self.fst.take_screenshot_in_memory("targets", CORDS["RADAR_TARGETS"])
         radar_targets_image = self.radar_status.load_image(radar_targets_buffer)
         target_dots = self.radar_status.count_red_dots(radar_targets_image)
 
-        radar_direction_buffer = self.fst.take_screenshot_in_memory(CORDS["RADAR_DIRECTIONS"])
+        radar_direction_buffer = self.fst.take_screenshot_in_memory("direction", CORDS["RADAR_DIRECTIONS"])
         direction = self.radar_status.predict_direction_from_bytes(radar_direction_buffer)
 
-        target_name_buffer = self.fst.take_screenshot_in_memory(CORDS["TARGET_NAME"])
+        target_name_buffer = self.fst.take_screenshot_in_memory("target_name",CORDS["TARGET_NAME"])
         target_name_res = self.target_name.extract_text_from_image(target_name_buffer)
 
-        cp_bar_buffer = self.fst.take_screenshot_in_memory(CORDS["CP_BAR"])
+        cp_bar_buffer = self.fst.take_screenshot_in_memory("cp", CORDS["CP_BAR"])
         cp_bar_data = self.cp_bar.calculate_percentage(cp_bar_buffer)
 
-        tv_buffer = self.fst.take_screenshot_in_memory(CORDS["TV"])
+        tv_buffer = self.fst.take_screenshot_in_memory("tv", CORDS["TV"])
         tv_data = self.tv_reader.extract_text_from_image(tv_buffer)
 
-        anti_buffer = self.fst.take_screenshot_in_memory(CORDS["ANTI"])
+        anti_buffer = self.fst.take_screenshot_in_memory("anti", CORDS["ANTI"])
         anti_data = self.anti.extract_text_from_image(anti_buffer)
 
         return {
