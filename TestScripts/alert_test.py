@@ -5,7 +5,7 @@ import time
 pygame.mixer.init()
 
 # Load the sound file
-sound_file = "../ScreenController/files/cp.mp3"  # Replace with your sound file path
+sound_file = "../ScreenController/files/tv.mp3"  # Replace with your sound file path
 pygame.mixer.music.load(sound_file)
 
 # Play the sound

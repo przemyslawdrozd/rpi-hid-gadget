@@ -13,11 +13,13 @@ class HIDMapper:
         }
 
     def generate_instructions(self, data) -> [str]:
+        self.history.insert(0, data)
+
+        if data["is_tv"]:
+            return ["Release"]
 
         if self.active_skill.check_interval():
             return ["F5", "F6"]
-
-        self.history.insert(0, data)
 
         if len(self.history) > 5:
             self.history = self.history[:5]

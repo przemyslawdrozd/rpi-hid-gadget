@@ -4,8 +4,8 @@ from PIL import Image
 from io import BytesIO
 import pygame
 
-
 CP_PREFIX = 130
+
 
 class CPBar:
     def __init__(self):
