@@ -7,7 +7,7 @@ from ..utils.TargetName import TargetName
 from ..utils.CPBar import CPBar
 from ..utils.TVReader import TVReader
 from ..utils.Anti import Anti
-from ..consts import LOGGER_NAME
+from ..consts import LOGGER_NAME, CORDS
 
 logger = logging.getLogger(LOGGER_NAME)
 
@@ -26,75 +26,28 @@ class ScreenHandler:
         self.tv_reader = TVReader()
         self.anti = Anti()
 
-    def aggregate_screen_data(self):
-        health_cords = {
-            'L': 800,
-            'T': 53,
-            'W': 360,
-            'H': 7
-        }
-        health_bar_buffer = self.fst.take_screenshot_in_memory(health_cords)
+    def aggregate_screen_data(self) -> dict:
+
+        health_bar_buffer = self.fst.take_screenshot_in_memory(CORDS["HEALTH"])
         health_bar_res = self.health_bar.calculate_red_bar_percentage(health_bar_buffer)
 
-        radar_targets_cords = {
-            'L': 1472,
-            'T': 40,
-            'W': 200,
-            'H': 200
-        }
-        radar_targets_buffer = self.fst.take_screenshot_in_memory(radar_targets_cords)
+        radar_targets_buffer = self.fst.take_screenshot_in_memory(CORDS["RADAR_TARGETS"])
         radar_targets_image = self.radar_status.load_image(radar_targets_buffer)
         target_dots = self.radar_status.count_red_dots(radar_targets_image)
-        logger.debug(f"target_dots {target_dots}")
 
-        radar_direction_cords = {
-            'L': 1545,
-            'T': 113,
-            'W': 60,
-            'H': 60
-        }
-        radar_direction_buffer = self.fst.take_screenshot_in_memory(radar_direction_cords)
+        radar_direction_buffer = self.fst.take_screenshot_in_memory(CORDS["RADAR_DIRECTIONS"])
         direction = self.radar_status.predict_direction_from_bytes(radar_direction_buffer)
-        logger.debug(f"direction {direction}")
 
-        target_name_cords = {
-            'L': 850,
-            'T': 30,
-            'W': 250,
-            'H': 25
-        }
-        target_name_buffer = self.fst.take_screenshot_in_memory(target_name_cords)
+        target_name_buffer = self.fst.take_screenshot_in_memory(CORDS["TARGET_NAME"])
         target_name_res = self.target_name.extract_text_from_image(target_name_buffer)
-        logger.debug(f"target_name_res {target_name_res}")
 
-        cp_bar_cords = {
-            'L': 200,
-            'T': 60,
-            'W': 175,
-            'H': 8
-        }
-
-        cp_bar_buffer = self.fst.take_screenshot_in_memory(cp_bar_cords)
+        cp_bar_buffer = self.fst.take_screenshot_in_memory(CORDS["CP_BAR"])
         cp_bar_data = self.cp_bar.calculate_percentage(cp_bar_buffer)
 
-        tv_cords = {
-            'L': 420,
-            'T': 75,
-            'W': 200,
-            'H': 40
-        }
-
-        tv_buffer = self.fst.take_screenshot_in_memory(tv_cords)
+        tv_buffer = self.fst.take_screenshot_in_memory(CORDS["TV"])
         tv_data = self.tv_reader.extract_text_from_image(tv_buffer)
 
-        anti_cords = {
-            'L': 420,
-            'T': 75,
-            'W': 200,
-            'H': 40
-        }
-
-        anti_buffer = self.fst.take_screenshot_in_memory(anti_cords)
+        anti_buffer = self.fst.take_screenshot_in_memory(CORDS["ANTI"])
         anti_data = self.anti.extract_text_from_image(anti_buffer)
 
         return {
