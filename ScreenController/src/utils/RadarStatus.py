@@ -8,7 +8,7 @@ from tensorflow.keras.models import load_model
 class RadarStatus:
 
     def __init__(self):
-        self.model = load_model("angle_classification_model.h5")
+        self.model = load_model("files/angle_classification_model.h5")
 
     def load_image(self, img_byte_arr) -> BytesIO:
         """

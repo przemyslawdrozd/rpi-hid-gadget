@@ -7,6 +7,7 @@ from PIL import Image
 import cv2
 import numpy as np
 
+from cp_bar import CPBar
 BAR_PREFIX = 66
 
 class HealthBar:
@@ -55,7 +56,7 @@ class HealthBar:
 
 
 class FragmentScreenTaker:
-    def __init__(self, left=800, top=53, width=360, height=7):
+    def __init__(self, left=405, top=150, width=180, height=15):
         """
         Initialize the region of the screen to capture.
         Args:
@@ -105,13 +106,15 @@ class FragmentScreenTaker:
 
 async def main():
     fragment_screen_taker = FragmentScreenTaker()
-    health_bar = HealthBar()
+    # health_bar = HealthBar()
+    cp_bar = CPBar()
 
     # Take the screenshot asynchronously
     take_in_memory_image_buffer, screenshot = await fragment_screen_taker.take_screenshot_in_memory()
 
     # Process the health bar percentage asynchronously
-    res = health_bar.calculate_red_bar_percentage(take_in_memory_image_buffer)
+    # res = health_bar.calculate_red_bar_percentage(take_in_memory_image_buffer)
+    res = cp_bar.calculate_orange_percentage(take_in_memory_image_buffer)
 
     # Measure the start time
     start_time = time.time()
