@@ -8,7 +8,7 @@ from ..consts import LOGGER_NAME
 
 logger = logging.getLogger(LOGGER_NAME)
 
-REGEX_PATTERN = r'to\s?village'
+REGEX_PATTERN = r'to\s?vil{1,2}age'
 
 
 class TVReader:
