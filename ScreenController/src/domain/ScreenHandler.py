@@ -5,6 +5,7 @@ from ..utils.HealthBar import HealthBar
 from ..utils.RadarStatus import RadarStatus
 from ..utils.TargetName import TargetName
 from ..utils.CPBar import CPBar
+from ..utils.TVReader import TVReader
 from ..consts import LOGGER_NAME
 
 logger = logging.getLogger(LOGGER_NAME)
@@ -21,6 +22,7 @@ class ScreenHandler:
         self.radar_status = RadarStatus()
         self.target_name = TargetName()
         self.cp_bar = CPBar()
+        self.tv_reader = TVReader()
 
     def aggregate_screen_data(self):
         health_cords = {
@@ -73,8 +75,19 @@ class ScreenHandler:
         cp_bar_buffer = self.fst.take_screenshot_in_memory(cp_bar_cords)
         cp_bar_data = self.cp_bar.calculate_percentage(cp_bar_buffer)
 
+        tv_cords = {
+            'L': 420,
+            'T': 75,
+            'W': 200,
+            'H': 40
+        }
+
+        tv_buffer = self.fst.take_screenshot_in_memory(tv_cords)
+        tv_data = self.tv_reader.extract_text_from_image(tv_buffer)
+
         return {
             "char_cp": cp_bar_data,
+            "is_tv": tv_data,
             "health_bar": health_bar_res,
             "target_name": target_name_res,
             "target_dots": target_dots,

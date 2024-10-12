@@ -8,10 +8,11 @@ import logging
 import time
 import pyautogui
 from io import BytesIO
+import pygame
 
 
 class FragmentScreenTaker:
-    def __init__(self, left=420, top=70, width=360, height=40):
+    def __init__(self, left=420, top=75, width=360, height=40):
         """
         Initialize the region of the screen to capture.
         Args:
