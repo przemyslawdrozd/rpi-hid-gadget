@@ -35,7 +35,7 @@ class TVReader:
 
         # Use pytesseract to extract text from the image
         extracted_text = pytesseract.image_to_string(img)
-        logger.debug(f"extracted_text: {extracted_text}")
+        logger.debug(f"tv extracted_text: {extracted_text}")
         matches = re.findall(REGEX_PATTERN, extracted_text, re.IGNORECASE)
 
         result = len(matches) > 0

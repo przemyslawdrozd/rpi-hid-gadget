@@ -40,8 +40,6 @@ class SCService:
             instructions = await self.get_instructions()
             logger.debug(f"Broadcasting instructions: {instructions}")
 
-
-
             await self.ws_client.broadcast_message(instructions)
 
             control_sleep = self.hid_mapper.analise_instructions(instructions)
