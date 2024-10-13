@@ -2,6 +2,7 @@ import time
 import logging
 import pyautogui
 from io import BytesIO
+import argparse
 from ..consts import LOGGER_NAME
 
 logger = logging.getLogger(LOGGER_NAME)
@@ -9,7 +10,10 @@ logger = logging.getLogger(LOGGER_NAME)
 
 class FragmentScreenTaker:
 
-    def take_screenshot_in_memory(self, cords: dir) -> BytesIO:
+    def __init__(self, args: argparse.Namespace):
+        self.args = args
+
+    def take_screenshot_in_memory(self, key: str, cords: dir) -> BytesIO:
         """
         Takes a screenshot of a specified region and returns it as an in-memory BytesIO object.
 
@@ -30,7 +34,8 @@ class FragmentScreenTaker:
         screenshot = pyautogui.screenshot(region=(left, top, width, height))
 
         # Save screenshot
-        # screenshot.save(f"save_{start_time}.png")
+        if self.args.screen:
+            screenshot.save(f"{key}.png")
 
         # Measure the time after taking the screenshot
         screenshot_time = time.time()

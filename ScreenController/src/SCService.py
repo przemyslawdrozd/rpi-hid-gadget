@@ -1,24 +1,29 @@
+import sys
 import time
 import asyncio
 import logging
+import argparse
 
 from .domain.WSServer import WSServer
 from .domain.ScreenHandler import ScreenHandler
 from .domain.HIDMapper import HIDMapper
+from .utils.ConsoleLog import ConsoleLog
 from .consts import LOGGER_NAME
 
 logger = logging.getLogger(LOGGER_NAME)
 
 
 class SCService:
-    def __init__(self):
+    def __init__(self, args: argparse.Namespace):
+        self.args = args
         self.ws_client = WSServer()
-        self.screen_handler = ScreenHandler()
+        self.screen_handler = ScreenHandler(args)
         self.hid_mapper = HIDMapper()
+        self.cl = ConsoleLog()
 
     async def get_instructions(self):
         """A method to define or fetch instructions periodically."""
-        logger.info("Fetching instructions...")
+        logger.debug("Fetching instructions...")
 
         # Async
         # loop = asyncio.get_running_loop()
@@ -27,6 +32,13 @@ class SCService:
         screen_data = self.screen_handler.aggregate_screen_data()
         logger.debug(f"Aggregated screen data: {screen_data}")
 
+        logger.debug(f"args {self.args}")
+        if not self.args.debug:
+            self.cl.log(screen_data)
+
+        if self.args.screen:
+            sys.exit()
+
         instructions = self.hid_mapper.generate_instructions(screen_data)
         logger.debug(f"Created instructions: {instructions}")
 
@@ -34,7 +46,7 @@ class SCService:
 
     async def handle_broadcast_loop(self):
         """Start the broadcast and manage instructions."""
-        logger.info("Starting the broadcast loop...")
+        logger.debug("Starting the broadcast loop...")
         while True:
             start_time = time.perf_counter()  # Start timing
             instructions = await self.get_instructions()

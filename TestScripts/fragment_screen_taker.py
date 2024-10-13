@@ -43,7 +43,5 @@ class FragmentScreenTaker:
         screenshot.save(img_byte_arr, format='PNG')
         screenshot.save(f"save_{start_time}.png")
 
-
-
         # Return the in-memory object
         return img_byte_arr, screenshot

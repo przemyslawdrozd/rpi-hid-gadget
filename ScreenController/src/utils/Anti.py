@@ -8,7 +8,7 @@ from ..consts import LOGGER_NAME
 
 logger = logging.getLogger(LOGGER_NAME)
 
-REGEX_PATTERN = r'Anti'
+REGEX_PATTERN = r'anti(\w+(:\s?\w)?)?'
 
 
 class Anti:
@@ -37,7 +37,7 @@ class Anti:
         extracted_text = pytesseract.image_to_string(img)
         logger.debug(f"anti extracted_text: {extracted_text}")
         matches = re.findall(REGEX_PATTERN, extracted_text, re.IGNORECASE)
-
+        logger.debug(f"anti matches: {matches}")
         result = len(matches) > 0
 
         if result:
