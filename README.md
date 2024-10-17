@@ -20,10 +20,10 @@ This project enables a Raspberry Pi Zero to act as a Human Interface Device (HID
 
 ## Setup
 
-### 1. Configure RPI as HID
-1. **Enable USB Gadget mode**: This allows the Raspberry Pi to be recognized as a keyboard when plugged into another device.
-   ```bash
-   https://randomnerdtutorials.com/raspberry-pi-zero-usb-keyboard-hid/
+### Configure RPI as HID
+
+For detailed instructions on how to enable HID on Raspberry Pi, refer to this [tutorial on Random Nerd Tutorials](https://randomnerdtutorials.com/raspberry-pi-zero-usb-keyboard-hid/).
+
 
 
 ## How to Start & Run
