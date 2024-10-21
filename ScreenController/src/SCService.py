@@ -18,7 +18,7 @@ class SCService:
         self.args = args
         self.ws_client = WSServer()
         self.screen_handler = ScreenHandler(args)
-        self.hid_mapper = HIDMapper()
+        self.hid_mapper = HIDMapper(args.assist)
         self.cl = ConsoleLog()
 
     async def get_instructions(self):

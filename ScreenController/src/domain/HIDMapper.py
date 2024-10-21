@@ -1,25 +1,33 @@
 from ..utils.ActiveSkill import ActiveSkill
 
+DIRECTION_THRESHOLD = 20
+
+DIRECTION_MAP = {
+    "NE": 45,
+    "SE": 135,
+    "SW": 225,
+    "NW": 315
+}
+
 
 class HIDMapper:
-    def __init__(self):
+    def __init__(self, is_assist_mode: bool):
         self.active_skill = ActiveSkill()
         self.history = []
-        self.directions_map = {
-            'NE': 45,
-            'SE': 135,
-            'SW': 225,
-            'NW': 315
-        }
+        self.is_assist_mode = is_assist_mode
+        self.assist_status = None
 
     def generate_instructions(self, data) -> [str]:
         self.history.insert(0, data)
 
-        if data["is_tv"]:
+        if data["is_tv"] or data["is_anti"]:
             return ["Release"]
 
         if self.active_skill.check_interval():
-            return ["F5", "F6"]
+            return ["F5"]
+
+        if self.is_assist_mode:
+            return self.__handle_assist_mode(data)
 
         if len(self.history) > 5:
             self.history = self.history[:5]
@@ -33,17 +41,23 @@ class HIDMapper:
             return ["F2"]
         return ["F1", "F2"]
 
+    def __handle_assist_mode(self, data):
+        if data["health_bar"] < 1:
+            return ["F8", "F8", "F9"]
+
+        return ["F2"]
+
+
     @staticmethod
-    def analise_instructions(instructions: [str]):
+    def analise_instructions(instructions: [str]) -> int:
         for char in instructions:
             if char.startswith("a_"):
                 return 2
         return 0
 
-    def _calculate_direction(self, data):
+    def _calculate_direction(self, data) -> [str]:
         target_dots = data['target_dots']
         current_direction = data['direction']
-        threshold = 20
 
         # Find the quadrant with the highest target dot count
         max_target_quadrant = max(target_dots, key=target_dots.get)
@@ -54,13 +68,13 @@ class HIDMapper:
             return ["F1"]
 
         # Get the expected direction for the quadrant with the highest target count
-        expected_direction = self.directions_map[max_target_quadrant]
+        expected_direction = DIRECTION_MAP[max_target_quadrant]
 
         # Check if the current direction is within the threshold of the expected direction
-        if abs(expected_direction - current_direction) <= threshold:
+        if abs(expected_direction - current_direction) <= DIRECTION_THRESHOLD:
             return ["a_up"]
         # Check if the current direction is in the opposite quadrant
-        elif abs((expected_direction + 180) % 360 - current_direction) <= threshold:
+        elif abs((expected_direction + 180) % 360 - current_direction) <= DIRECTION_THRESHOLD:
             return ["a_down"]
         # Determine whether to turn right or left based on the difference between current and expected direction
         else:

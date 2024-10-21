@@ -36,12 +36,11 @@ async def main_async(args: argparse.Namespace):
 def main():
     # Parse command-line arguments
     parser = argparse.ArgumentParser(description="Run the screen controller service")
-    parser.add_argument(
-        "-debug", action="store_true", help="Run in debug mode"
-    )
-    parser.add_argument(
-        "-screen", action="store_true", help="Run in screen mode"
-    )
+
+    parser.add_argument("-debug", action="store_true", help="Run in debug mode")
+    parser.add_argument("-screen", action="store_true", help="Run in screen mode")
+    parser.add_argument("-assist", action="store_true", help="Run in assist mode")
+
     args = parser.parse_args()
 
     # Set logger based on debug argument

@@ -1,6 +1,6 @@
 import time
 
-ACTIVE_INTERVAL = 60  # Seconds
+ACTIVE_INTERVAL = 30  # Seconds
 
 
 class ActiveSkill:
