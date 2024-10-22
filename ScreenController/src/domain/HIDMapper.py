@@ -1,3 +1,4 @@
+import re
 import argparse
 from ..utils.ActiveSkill import ActiveSkill
 
@@ -10,6 +11,7 @@ DIRECTION_MAP = {
     "NW": 315
 }
 
+OWN_CHAR_NAME = r"\bPrzemo\b"
 
 class HIDMapper:
     def __init__(self, args: argparse.Namespace):
@@ -23,6 +25,10 @@ class HIDMapper:
         self.history.insert(0, data)
 
         if data["is_tv"] or data["is_anti"]:
+            return ["Release"]
+        
+        # Search for the pattern with case insensitivity
+        if self.__handle_own_name(data):
             return ["Release"]
 
         if self.active_skill.check_interval():
@@ -59,6 +65,14 @@ class HIDMapper:
             self.it_status = False
             return ["a_down", "F1"]
         return ["F1"]
+    
+    def __handle_own_name(self, data):
+        # Search for the pattern with case insensitivity
+        match = re.search(OWN_CHAR_NAME, data["target_name"], re.IGNORECASE)
+
+        if match:
+            return True
+        return False
 
     @staticmethod
     def analise_instructions(instructions: [str]) -> int:
