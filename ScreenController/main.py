@@ -40,6 +40,7 @@ def main():
     parser.add_argument("-debug", action="store_true", help="Run in debug mode")
     parser.add_argument("-screen", action="store_true", help="Run in screen mode")
     parser.add_argument("-assist", action="store_true", help="Run in assist mode")
+    parser.add_argument("-it", action="store_true", help="Run in assist mode")
 
     args = parser.parse_args()
 

@@ -2,9 +2,9 @@ LOGGER_NAME = "ScreenController"
 LOG_FORMATTING = "%(asctime)s [%(levelname)s] %(message)s"
 
 # Cords
-HEALTH = {"L": 800, "T": 53, "W": 360, "H": 7}
+HEALTH = {"L": 775, "T": 53, "W": 360, "H": 7}
 RADAR_TARGETS = {"L": 1472, "T": 40, "W": 200, "H": 200}
-RADAR_DIRECTIONS = {"L": 1552, "T": 110, "W": 60, "H": 60}
+RADAR_DIRECTIONS = {"L": 1542, "T": 105, "W": 60, "H": 60}
 TARGET_NAME = {"L": 850, "T": 30, "W": 250, "H": 25}
 CP_BAR = {"L": 200, "T": 60, "W": 175, "H": 8}
 TV = {"L": 805, "T": 375, "W": 70, "H": 20}

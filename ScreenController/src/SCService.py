@@ -18,7 +18,7 @@ class SCService:
         self.args = args
         self.ws_client = WSServer()
         self.screen_handler = ScreenHandler(args)
-        self.hid_mapper = HIDMapper(args.assist)
+        self.hid_mapper = HIDMapper(args)
         self.cl = ConsoleLog()
 
     async def get_instructions(self):
@@ -32,15 +32,15 @@ class SCService:
         screen_data = self.screen_handler.aggregate_screen_data()
         logger.debug(f"Aggregated screen data: {screen_data}")
 
+        instructions = self.hid_mapper.generate_instructions(screen_data)
+        logger.debug(f"Created instructions: {instructions}")
+        
         logger.debug(f"args {self.args}")
         if not self.args.debug:
-            self.cl.log(screen_data)
+            self.cl.log(screen_data, instructions)
 
         if self.args.screen:
             sys.exit()
-
-        instructions = self.hid_mapper.generate_instructions(screen_data)
-        logger.debug(f"Created instructions: {instructions}")
 
         return instructions
 
