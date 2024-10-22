@@ -1,3 +1,4 @@
+import argparse
 from ..utils.ActiveSkill import ActiveSkill
 
 DIRECTION_THRESHOLD = 20
@@ -11,11 +12,12 @@ DIRECTION_MAP = {
 
 
 class HIDMapper:
-    def __init__(self, is_assist_mode: bool):
+    def __init__(self, args: argparse.Namespace):
         self.active_skill = ActiveSkill()
         self.history = []
-        self.is_assist_mode = is_assist_mode
+        self.args = args
         self.assist_status = None
+        self.it_status = True
 
     def generate_instructions(self, data) -> [str]:
         self.history.insert(0, data)
@@ -26,16 +28,21 @@ class HIDMapper:
         if self.active_skill.check_interval():
             return ["F5"]
 
-        if self.is_assist_mode:
+        if self.args.assist:
             return self.__handle_assist_mode(data)
 
         if len(self.history) > 5:
             self.history = self.history[:5]
 
         if data['target_name'] == "":
+            if self.args.it:
+                return self.__handle_it_mode()
+            
             instructions = self._calculate_direction(data)
             instructions.append("F1")
             return instructions
+
+        self.it_status = True
 
         if data["health_bar"] > 1:
             return ["F2"]
@@ -46,7 +53,12 @@ class HIDMapper:
             return ["F8", "F8", "F9"]
 
         return ["F2"]
-
+    
+    def __handle_it_mode(self):
+        if  self.it_status:
+            self.it_status = False
+            return ["a_down", "F1"]
+        return ["F1"]
 
     @staticmethod
     def analise_instructions(instructions: [str]) -> int:
