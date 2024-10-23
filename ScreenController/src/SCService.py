@@ -8,6 +8,8 @@ from .domain.WSServer import WSServer
 from .domain.ScreenHandler import ScreenHandler
 from .domain.HIDMapper import HIDMapper
 from .utils.ConsoleLog import ConsoleLog
+from .utils.Anti import Anti
+
 from .consts import LOGGER_NAME
 
 logger = logging.getLogger(LOGGER_NAME)
@@ -17,8 +19,9 @@ class SCService:
     def __init__(self, args: argparse.Namespace):
         self.args = args
         self.ws_client = WSServer()
-        self.screen_handler = ScreenHandler(args)
-        self.hid_mapper = HIDMapper(args)
+        self.anti = Anti()
+        self.screen_handler = ScreenHandler(self.anti, args)
+        self.hid_mapper = HIDMapper(self.anti, args)
         self.cl = ConsoleLog()
 
     async def get_instructions(self):

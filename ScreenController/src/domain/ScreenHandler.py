@@ -7,14 +7,13 @@ from ..utils.RadarStatus import RadarStatus
 from ..utils.TargetName import TargetName
 from ..utils.CPBar import CPBar
 from ..utils.TVReader import TVReader
-from ..utils.Anti import Anti
 from ..consts import LOGGER_NAME, CORDS
 
 logger = logging.getLogger(LOGGER_NAME)
 
 
 class ScreenHandler:
-    def __init__(self, args: argparse.Namespace):
+    def __init__(self, anti, args: argparse.Namespace):
         """
         Initialize the ScreenHandler with a FragmentScreenTaker instance.
         :param fragment screen-taker: Instance of FragmentScreenTaker used for taking screenshots.
@@ -26,7 +25,7 @@ class ScreenHandler:
         self.target_name = TargetName()
         self.cp_bar = CPBar()
         self.tv_reader = TVReader()
-        self.anti = Anti()
+        self.anti = anti
 
     def aggregate_screen_data(self) -> dict:
         health_bar_buffer = self.fst.take_screenshot_in_memory("health", CORDS["HEALTH"])
@@ -55,8 +54,9 @@ class ScreenHandler:
             "char_cp": cp_bar_data,
             "is_tv": tv_data,
             "is_anti": anti_data,
+            "anti counter": self.anti.anti_counter,
             "health_bar": health_bar_res,
             "target_name": target_name_res,
             "target_dots": target_dots,
-            "direction": direction
+            "direction": direction,
         }

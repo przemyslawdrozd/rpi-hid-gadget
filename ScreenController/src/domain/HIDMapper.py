@@ -1,5 +1,6 @@
 import re
 import argparse
+from ..utils.Anti import Anti
 from ..utils.ActiveSkill import ActiveSkill
 
 DIRECTION_THRESHOLD = 20
@@ -14,8 +15,9 @@ DIRECTION_MAP = {
 OWN_CHAR_NAME = r"\bPrzemo\b"
 
 class HIDMapper:
-    def __init__(self, args: argparse.Namespace):
+    def __init__(self, anti: Anti, args: argparse.Namespace):
         self.active_skill = ActiveSkill()
+        self.anti = anti
         self.history = []
         self.args = args
         self.assist_status = None
@@ -24,7 +26,10 @@ class HIDMapper:
     def generate_instructions(self, data) -> [str]:
         self.history.insert(0, data)
 
-        if data["is_tv"] or data["is_anti"]:
+        if data["is_anti"]:
+            return self.anti.handle_action()
+
+        if data["is_tv"]:
             return ["Release"]
         
         # Search for the pattern with case insensitivity
