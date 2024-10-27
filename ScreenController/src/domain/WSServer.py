@@ -29,7 +29,7 @@ class WSServer:
         self.connected_client = websocket
         try:
             async for message in websocket:
-                print(f"Received message: {message}")
+                logger.debug(f"Received message: {message}")
                 await websocket.send(f"Echo: {message}")
         finally:
             # Unregister the client on disconnection
@@ -44,7 +44,6 @@ class WSServer:
             except websockets.exceptions.ConnectionClosed:
                 logger.error("WS failed to broadcast_message")
                 self.connected_client = None
-        await asyncio.sleep(1)  # Send message every 1 second
 
     async def start_server(self):
         """Start the WebSocket server."""
