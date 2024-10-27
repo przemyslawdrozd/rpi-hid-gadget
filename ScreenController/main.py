@@ -5,6 +5,8 @@ import asyncio
 import argparse
 from src.SCService import SCService
 from src.consts import LOGGER_NAME, LOG_FORMATTING
+import pytesseract
+pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
 
 logger = logging.getLogger(LOGGER_NAME)
 
@@ -41,6 +43,7 @@ def main():
     parser.add_argument("-screen", action="store_true", help="Run in screen mode")
     parser.add_argument("-assist", action="store_true", help="Run in assist mode")
     parser.add_argument("-it", action="store_true", help="Run in assist mode")
+    parser.add_argument("-virtual", action="store_true", help="Run in virtual mode")
 
     args = parser.parse_args()
 

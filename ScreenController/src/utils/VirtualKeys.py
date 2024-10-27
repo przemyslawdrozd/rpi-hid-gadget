@@ -49,50 +49,41 @@ def release_key(hexKeyCode):
     x = Input(ctypes.c_ulong(1), ii_)
     ctypes.windll.user32.SendInput(1, ctypes.pointer(x), ctypes.sizeof(x))
 
+HID_KEY_MAP = {
+    "Release": 0x00,
+    "Space": 0x20,         # Virtual-Key Code for Space
+    "Enter": 0x0D,         # Virtual-Key Code for Enter
+
+    # Alphabet keys
+    "a": 0x41,             # Virtual-Key Code for 'A'
+    "b": 0x42,             # Virtual-Key Code for 'B'
+    
+    # Function keys (F1-F12)
+    "F1": 0x70,            # Virtual-Key Code for F1
+    "F2": 0x71,            # Virtual-Key Code for F2
+    "F3": 0x72,            # Virtual-Key Code for F3
+    "F4": 0x73,            # Virtual-Key Code for F4
+    "F5": 0x74,            # Virtual-Key Code for F5
+    "F6": 0x75,            # Virtual-Key Code for F6
+    "F7": 0x76,            # Virtual-Key Code for F7
+    "F8": 0x77,            # Virtual-Key Code for F8
+    "F9": 0x78,            # Virtual-Key Code for F9
+    "F10": 0x79,           # Virtual-Key Code for F10
+    "F11": 0x7A,           # Virtual-Key Code for F11
+    "F12": 0x7B,           # Virtual-Key Code for F12
+
+    # Arrow keys
+    "a_up": 0x26,          # Virtual-Key Code for Up Arrow
+    "a_down": 0x28,        # Virtual-Key Code for Down Arrow
+    "a_left": 0x25,        # Virtual-Key Code for Left Arrow
+    "a_right": 0x27        # Virtual-Key Code for Right Arrow
+}
+
 # Press and release a key, using the Virtual-Key Code (e.g., 0x72 for F3)
-def press_and_release_key(vk_code):
+def press_and_release_key(key):
+
+    vk_code = HID_KEY_MAP[key]
+    print("Got VK", key, vk_code)
     press_key(vk_code)  # Press the key
     time.sleep(0.05)    # Short delay
     release_key(vk_code)  # Release the key
-
-# Virtual-Key Code for F3
-VK_F3 = 0x72
-
-# Mapping for common key virtual codes
-VK_A = 0x41
-
-
-NULL_CHAR = chr(0)
-HID_KEY_MAP = {
-    "Release": (NULL_CHAR * 8),
-    "Space": (NULL_CHAR * 2 + chr(44) + NULL_CHAR * 5),
-    "Enter": (NULL_CHAR * 2 + chr(40) + NULL_CHAR * 5),
-
-    "a": (NULL_CHAR * 2 + chr(4) + NULL_CHAR * 5),
-    "b": (NULL_CHAR * 2 + chr(5) + NULL_CHAR * 5),
-
-    "F1": (NULL_CHAR * 2 + chr(58) + NULL_CHAR * 5),
-    "F2": (NULL_CHAR * 2 + chr(59) + NULL_CHAR * 5),
-    "F3": 0x72,
-    "F4": (NULL_CHAR * 2 + chr(61) + NULL_CHAR * 5),
-    "F5": (NULL_CHAR * 2 + chr(62) + NULL_CHAR * 5),
-    "F6": (NULL_CHAR * 2 + chr(63) + NULL_CHAR * 5),
-    "F7": (NULL_CHAR * 2 + chr(64) + NULL_CHAR * 5),
-    "F8": (NULL_CHAR * 2 + chr(65) + NULL_CHAR * 5),
-    "F9": (NULL_CHAR * 2 + chr(66) + NULL_CHAR * 5),
-    "F10": (NULL_CHAR * 2 + chr(67) + NULL_CHAR * 5),
-    "F11": (NULL_CHAR * 2 + chr(68) + NULL_CHAR * 5),
-    "F12": (NULL_CHAR * 2 + chr(69) + NULL_CHAR * 5),
-
-    "a_up": (NULL_CHAR * 2 + chr(82) + NULL_CHAR * 5),
-    "a_down": (NULL_CHAR * 2 + chr(81) + NULL_CHAR * 5),
-    "a_left": (NULL_CHAR * 2 + chr(80) + NULL_CHAR * 5),
-    "a_right": (NULL_CHAR * 2 + chr(79) + NULL_CHAR * 5)
-}
-
-
-if __name__ == "__main__":
-    time.sleep(2)  # Give yourself time to focus on the target window (e.g., Notepad)
-
-    # Example: Press and release the F3 key
-    press_and_release_key(HID_KEY_MAP["F3"])

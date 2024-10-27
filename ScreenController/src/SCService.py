@@ -10,6 +10,8 @@ from .domain.HIDMapper import HIDMapper
 from .utils.ConsoleLog import ConsoleLog
 from .utils.Anti import Anti
 
+from .utils.VirtualKeys import press_and_release_key
+
 from .consts import LOGGER_NAME
 
 logger = logging.getLogger(LOGGER_NAME)
@@ -55,7 +57,11 @@ class SCService:
             instructions = await self.get_instructions()
             logger.debug(f"Broadcasting instructions: {instructions}")
 
-            await self.ws_client.broadcast_message(instructions)
+            if self.args.virtual:
+                for instruction in instructions:
+                    press_and_release_key(instruction)
+            else:
+                await self.ws_client.broadcast_message(instructions)
 
             control_sleep = self.hid_mapper.analise_instructions(instructions)
 
@@ -75,7 +81,10 @@ class SCService:
 
     async def start_sc_service(self):
         """Start the WebSocket server and manage the event loop."""
-        logger.info("Starting WebSocket server...")
-        await self.ws_client.start_server()
-        logger.info("WebSocket server started. Entering the broadcast loop...")
+
+        if not self.args.virtual:
+            logger.info("Starting WebSocket server...")
+            await self.ws_client.start_server()
+            logger.info("WebSocket server started. Entering the broadcast loop...")
+        
         await self.handle_broadcast_loop()
