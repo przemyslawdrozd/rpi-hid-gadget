@@ -6,7 +6,7 @@ import argparse
 from src.SCService import SCService
 from src.consts import LOGGER_NAME, LOG_FORMATTING
 import pytesseract
-pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
+# pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
 
 logger = logging.getLogger(LOGGER_NAME)
 
