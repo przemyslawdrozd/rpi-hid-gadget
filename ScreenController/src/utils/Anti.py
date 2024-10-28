@@ -54,7 +54,7 @@ class Anti:
         if self.start_process is None:
             self.start_process = time.time()
             self.__increase_counter()
-            return ["Release"]
+            return ["F2"]
         
          # Check how much time has passed since the process started
         elapsed_time = time.time() - self.start_process
