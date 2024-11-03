@@ -2,8 +2,7 @@ import cv2
 import numpy as np
 from PIL import Image
 from io import BytesIO
-
-BAR_PREFIX = 66
+from ..consts import HEALTH_BAR_PREFIX
 
 
 class HealthBar:
@@ -45,6 +44,6 @@ class HealthBar:
         red_pixels = cv2.countNonZero(red_mask)
 
         # Calculate the percentage of red pixels
-        approx_percentage = (red_pixels / bar_width) * BAR_PREFIX
+        approx_percentage = (red_pixels / bar_width) * HEALTH_BAR_PREFIX
 
         return int(approx_percentage)

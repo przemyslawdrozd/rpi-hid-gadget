@@ -3,7 +3,7 @@ import argparse
 from ..utils.Anti import Anti
 from ..utils.ActiveSkill import ActiveSkill
 
-DIRECTION_THRESHOLD = 20
+DIRECTION_THRESHOLD = 40
 
 DIRECTION_MAP = {
     "NE": 45,

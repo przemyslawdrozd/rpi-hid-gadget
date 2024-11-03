@@ -3,8 +3,7 @@ import numpy as np
 from PIL import Image
 from io import BytesIO
 import pygame
-
-CP_PREFIX = 133
+from ..consts import CP_PREFIX
 
 
 class CPBar:
