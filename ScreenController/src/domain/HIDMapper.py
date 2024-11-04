@@ -35,6 +35,9 @@ class HIDMapper:
         # Search for the pattern with case insensitivity
         if self.__handle_own_name(data):
             return ["Release"]
+        
+        if data["char_cp"] < 100:
+            return ["Release"]
 
         if self.active_skill.check_interval():
             return ["F5"]
