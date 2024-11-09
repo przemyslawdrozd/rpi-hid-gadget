@@ -13,6 +13,7 @@ DIRECTION_MAP = {
 }
 
 OWN_CHAR_NAME = r"\bPrzemo\b"
+NEXT_TAGET_MODULO = 3
 
 class HIDMapper:
     def __init__(self, anti: Anti, args: argparse.Namespace):
@@ -22,6 +23,9 @@ class HIDMapper:
         self.args = args
         self.assist_status = None
         self.it_status = True
+
+        self.ms_current_next_target = 1
+        self.hit_flag = True
 
     def generate_instructions(self, data) -> [str]:
         self.history.insert(0, data)
@@ -35,9 +39,17 @@ class HIDMapper:
         # Search for the pattern with case insensitivity
         if self.__handle_own_name(data):
             return ["Release"]
+            # return ["a_up", "a_up"]
         
         if data["char_cp"] < 100:
             return ["Release"]
+        
+        if self.args.ms:
+            if data['target_name'] != "" and data["health_bar"] < 1:
+                return ["Esc", "Release", "F1", "F2"]
+            
+            return ["F1", "F2", "F1", "F2", "F1", "F2", "F3"]
+            # return self.__handle_magic_short_range(data)
 
         if self.active_skill.check_interval():
             return ["F5"]
@@ -81,6 +93,25 @@ class HIDMapper:
         if match:
             return True
         return False
+    
+    def __handle_magic_short_range(self, data):
+        # if data['target_name'] == "" and data["health_bar"] < 1:
+        #     instructions = self._calculate_direction(data)
+        #     instructions.append("F1")
+        #     return instructions
+
+        if data['target_name'] != "" and data["health_bar"] < 1:
+            return ["F4"]
+        
+        if data['target_name'] == "":
+            return ["F1"]
+        
+        if self.hit_flag:
+            self.hit_flag = False
+            return ["F2"]
+        else:
+            self.hit_flag = True
+            return ["F3"]
 
     @staticmethod
     def analise_instructions(instructions: [str]) -> int:
