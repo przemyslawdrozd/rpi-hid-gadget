@@ -31,12 +31,15 @@ class ScreenHandler:
         health_bar_buffer = self.fst.take_screenshot_in_memory("health", CORDS["HEALTH"])
         health_bar_res = self.health_bar.calculate_red_bar_percentage(health_bar_buffer)
 
-        radar_targets_buffer = self.fst.take_screenshot_in_memory("targets", CORDS["RADAR_TARGETS"])
-        radar_targets_image = self.radar_status.load_image(radar_targets_buffer)
-        target_dots = self.radar_status.count_red_dots(radar_targets_image)
+        # radar_targets_buffer = self.fst.take_screenshot_in_memory("targets", CORDS["RADAR_TARGETS"])
+        # radar_targets_image = self.radar_status.load_image(radar_targets_buffer)
+        # target_dots = self.radar_status.count_red_dots(radar_targets_image)
+        target_dots = {'NE': 0, 'SE': 0, 'SW': 0, 'NW': 0}
 
-        radar_direction_buffer = self.fst.take_screenshot_in_memory("direction", CORDS["RADAR_DIRECTIONS"])
-        direction = self.radar_status.predict_direction_from_bytes(radar_direction_buffer)
+        # radar_direction_buffer = self.fst.take_screenshot_in_memory("direction", CORDS["RADAR_DIRECTIONS"])
+        # direction = self.radar_status.predict_direction_from_bytes(radar_direction_buffer)
+        direction = 0
+
 
         target_name_buffer = self.fst.take_screenshot_in_memory("target_name",CORDS["TARGET_NAME"])
         target_name_res = self.target_name.extract_text_from_image(target_name_buffer)
