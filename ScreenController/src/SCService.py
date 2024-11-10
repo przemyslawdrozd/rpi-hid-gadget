@@ -37,11 +37,11 @@ class SCService:
         screen_data = self.screen_handler.aggregate_screen_data()
         logger.debug(f"Aggregated screen data: {screen_data}")
 
-        instructions = self.hid_mapper.generate_instructions(screen_data)
+        instructions = await self.hid_mapper.generate_instructions(screen_data)
         logger.debug(f"Created instructions: {instructions}")
         
         logger.debug(f"args {self.args}")
-        if not self.args.debug:
+        if not self.args.debug and not self.args.mage:
             self.cl.log(screen_data, instructions)
 
         if self.args.screen:

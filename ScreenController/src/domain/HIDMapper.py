@@ -2,6 +2,7 @@ import re
 import argparse
 from ..utils.Anti import Anti
 from ..utils.ActiveSkill import ActiveSkill
+from ..domain.Mage import Mage
 
 DIRECTION_THRESHOLD = 40
 
@@ -12,12 +13,14 @@ DIRECTION_MAP = {
     "NW": 315
 }
 
-OWN_CHAR_NAME = r"\bPrzemo\b"
+# OWN_CHAR_NAME = r"Za\b"
+
 NEXT_TAGET_MODULO = 3
 
 class HIDMapper:
     def __init__(self, anti: Anti, args: argparse.Namespace):
         self.active_skill = ActiveSkill()
+        self.mage = Mage()
         self.anti = anti
         self.history = []
         self.args = args
@@ -27,7 +30,7 @@ class HIDMapper:
         self.ms_current_next_target = 1
         self.hit_flag = True
 
-    def generate_instructions(self, data) -> [str]:
+    async def generate_instructions(self, data) -> [str]:
         self.history.insert(0, data)
 
         if data["is_anti"]:
@@ -39,17 +42,23 @@ class HIDMapper:
         # Search for the pattern with case insensitivity
         if self.__handle_own_name(data):
             return ["Release"]
-            # return ["a_up", "a_up"]
         
         if data["char_cp"] < 100:
             return ["Release"]
+        
+        if self.args.mage:
+            return await self.mage.handle_mage_action(data)
         
         if self.args.ms:
             if data['target_name'] != "" and data["health_bar"] < 1:
                 return ["Esc", "Release", "F1", "F2"]
             
-            return ["F1", "F2", "F1", "F2", "F1", "F2", "F3"]
-            # return self.__handle_magic_short_range(data)
+            # Spider
+            # return ["F1", "F2", "F1", "F2", "F1", "F2", "F3"]
+
+            # Academy
+            return ["F1", "F2","F3", "F1", "F2","F3", "F1", "F2","F3","F1", "F2","F3", "F1", "F2","F3", "F4"]
+            return self.__handle_magic_short_range(data)
 
         if self.active_skill.check_interval():
             return ["F5"]
