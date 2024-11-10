@@ -110,17 +110,12 @@ class HIDMapper:
         #     return instructions
 
         if data['target_name'] != "" and data["health_bar"] < 1:
-            return ["F4"]
+            return ["F4", "F3"]
         
         if data['target_name'] == "":
             return ["F1"]
         
-        if self.hit_flag:
-            self.hit_flag = False
-            return ["F2"]
-        else:
-            self.hit_flag = True
-            return ["F3"]
+        return ["F2"]
 
     @staticmethod
     def analise_instructions(instructions: [str]) -> int:

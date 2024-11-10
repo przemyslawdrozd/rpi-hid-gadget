@@ -8,13 +8,16 @@ from ..utils.TargetName import TargetName
 from ..utils.CPBar import CPBar
 from ..utils.MPBar import MPBar
 from ..utils.TVReader import TVReader
+from ..utils.ChatReader import ChatReader
+from ..utils.Anti import Anti
+
 from ..consts import LOGGER_NAME, CORDS
 
 logger = logging.getLogger(LOGGER_NAME)
 
 
 class ScreenHandler:
-    def __init__(self, anti, args: argparse.Namespace):
+    def __init__(self, anti: Anti, args: argparse.Namespace):
         """
         Initialize the ScreenHandler with a FragmentScreenTaker instance.
         :param fragment screen-taker: Instance of FragmentScreenTaker used for taking screenshots.
@@ -27,6 +30,7 @@ class ScreenHandler:
         self.cp_bar = CPBar()
         self.mp_bar = MPBar()
         self.tv_reader = TVReader()
+        self.chat = ChatReader()
         self.anti = anti
 
     def aggregate_screen_data(self) -> dict:
@@ -56,6 +60,10 @@ class ScreenHandler:
         tv_buffer = self.fst.take_screenshot_in_memory("tv", CORDS["TV"])
         tv_data = self.tv_reader.extract_text_from_image(tv_buffer)
 
+        chat_buffer = self.fst.take_screenshot_in_memory("chat", CORDS["CHAT"])
+        chat_data = self.chat.extract_text_from_image(chat_buffer)
+        logger.debug(f"chat_data: {chat_data}")
+
         anti_buffer = self.fst.take_screenshot_in_memory("anti", CORDS["ANTI"])
         anti_data = self.anti.extract_text_from_image(anti_buffer)
 
@@ -65,6 +73,7 @@ class ScreenHandler:
             "is_tv": tv_data,
             "is_anti": anti_data,
             "anti counter": self.anti.anti_counter,
+            "chat": chat_data,
             "health_bar": health_bar_res,
             "target_name": target_name_res,
             "target_dots": target_dots,

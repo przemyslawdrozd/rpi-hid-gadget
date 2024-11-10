@@ -61,7 +61,7 @@ class Mage:
         if self.data['target_name'] == "" and self.data["health_bar"] < 1:
             return self.find_target()
         
-        return ["F5"]
+        return ["F7"]
 
     def __loot(self):
         self.delay = 2
@@ -77,17 +77,17 @@ class Mage:
             self.is_attack = True
             self.current_search = 0
             self.try_count = self.try_count + 1
-
-            # if self.try_count == 5:
-            #     return self.__swap_target()
             
+            if self.data["chat"]["is_invalid"] or self.data["chat"]["is_cannot_see"] or self.data["chat"]["is_distance"]:
+                self.delay = 0.3
+                return ["F9"]
             
             if self.current_attack == 0:
-                return ["F5"]
+                return ["F5", "Release"]
             if self.current_attack == 1:
                 return ["F6"]
             
-            return ["F5"]
+            return ["F7"]
         
         self.delay = 0.5
         return None
@@ -97,10 +97,10 @@ class Mage:
             self.rest_mode = True
             return ["F11", "Release"]
         
-        if self.rest_mode and self.data["char_mp"] > 20:
+        if self.rest_mode and self.data["char_mp"] > 98:
             self.rest_mode = False
             self.delay = 0.5
-            return ["F10", "Release"]
+            return ["F11", "Release"]
         
         return ["Release"]
 

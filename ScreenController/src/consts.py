@@ -3,8 +3,8 @@ LOG_FORMATTING = "%(asctime)s [%(levelname)s] %(message)s"
 
 
 HEALTH_BAR_PREFIX = 68
-CP_PREFIX = 130
-MP_PREFIX = 106
+CP_PREFIX = 129
+MP_PREFIX = 107
 
 # Cords
 HEALTH = {"L": 775, "T": 53, "W": 360, "H": 7}
@@ -17,6 +17,7 @@ RADAR_DIRECTIONS = {"L": 1552, "T": 115, "W": 60, "H": 60}
 TARGET_NAME = {"L": 850, "T": 30, "W": 250, "H": 25}
 MP_BAR = {"L": 235, "T": 86, "W": 150, "H": 8}
 CP_BAR = {"L": 200, "T": 60, "W": 175, "H": 8}
+CHAT = {"L": 20, "T": 600, "W": 120, "H": 40}
 TV = {"L": 805, "T": 375, "W": 70, "H": 20}
 ANTI = {"L": 700, "T": 390, "W": 200, "H": 40}
 
@@ -38,4 +39,5 @@ CORDS = {
     "MP_BAR": MP_BAR,
     "TV": TV,
     "ANTI": ANTI,
+    "CHAT": CHAT
 }
