@@ -6,6 +6,7 @@ from ..utils.HealthBar import HealthBar
 from ..utils.RadarStatus import RadarStatus
 from ..utils.TargetName import TargetName
 from ..utils.CPBar import CPBar
+from ..utils.MPBar import MPBar
 from ..utils.TVReader import TVReader
 from ..consts import LOGGER_NAME, CORDS
 
@@ -24,6 +25,7 @@ class ScreenHandler:
         self.radar_status = RadarStatus()
         self.target_name = TargetName()
         self.cp_bar = CPBar()
+        self.mp_bar = MPBar()
         self.tv_reader = TVReader()
         self.anti = anti
 
@@ -46,6 +48,10 @@ class ScreenHandler:
 
         cp_bar_buffer = self.fst.take_screenshot_in_memory("cp", CORDS["CP_BAR"])
         cp_bar_data = self.cp_bar.calculate_percentage(cp_bar_buffer)
+        
+        mp_bar_buffer = self.fst.take_screenshot_in_memory("mp", CORDS["MP_BAR"])
+        mp_bar_data = self.mp_bar.calculate_percentage(mp_bar_buffer)
+        logger.debug(f"mp_bar_data: {mp_bar_data}")
 
         tv_buffer = self.fst.take_screenshot_in_memory("tv", CORDS["TV"])
         tv_data = self.tv_reader.extract_text_from_image(tv_buffer)
@@ -55,6 +61,7 @@ class ScreenHandler:
 
         return {
             "char_cp": cp_bar_data,
+            "char_mp": mp_bar_data,
             "is_tv": tv_data,
             "is_anti": anti_data,
             "anti counter": self.anti.anti_counter,
