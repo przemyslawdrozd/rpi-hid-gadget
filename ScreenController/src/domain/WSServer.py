@@ -8,7 +8,7 @@ from ..consts import LOGGER_NAME
 PORT = 8765
 HOST = "0.0.0.0"
 
-DELAY = 0.2
+DELAY = 0.3
 
 logger = logging.getLogger(LOGGER_NAME)
 
