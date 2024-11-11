@@ -9,6 +9,7 @@ from ..utils.CPBar import CPBar
 from ..utils.MPBar import MPBar
 from ..utils.TVReader import TVReader
 from ..utils.ChatReader import ChatReader
+from ..utils.CastReader import CastReader
 from ..utils.Anti import Anti
 
 from ..consts import LOGGER_NAME, CORDS
@@ -29,8 +30,10 @@ class ScreenHandler:
         self.target_name = TargetName()
         self.cp_bar = CPBar()
         self.mp_bar = MPBar()
+        self.hp_char = HealthBar()
         self.tv_reader = TVReader()
         self.chat = ChatReader()
+        self.cast = CastReader()
         self.anti = anti
 
     def aggregate_screen_data(self) -> dict:
@@ -46,7 +49,6 @@ class ScreenHandler:
         # direction = self.radar_status.predict_direction_from_bytes(radar_direction_buffer)
         direction = 0
 
-
         target_name_buffer = self.fst.take_screenshot_in_memory("target_name",CORDS["TARGET_NAME"])
         target_name_res = self.target_name.extract_text_from_image(target_name_buffer)
 
@@ -57,12 +59,20 @@ class ScreenHandler:
         mp_bar_data = self.mp_bar.calculate_percentage(mp_bar_buffer)
         logger.debug(f"mp_bar_data: {mp_bar_data}")
 
+        # hp_bar_buffer = self.fst.take_screenshot_in_memory("hp", CORDS["HP_BAR"])
+        # hp_bar_data = self.hp_bar.calculate_percentage(hp_bar_buffer)
+        # logger.debug(f"hp_bar_data: {hp_bar_data}")
+
         tv_buffer = self.fst.take_screenshot_in_memory("tv", CORDS["TV"])
         tv_data = self.tv_reader.extract_text_from_image(tv_buffer)
 
         chat_buffer = self.fst.take_screenshot_in_memory("chat", CORDS["CHAT"])
         chat_data = self.chat.extract_text_from_image(chat_buffer)
         logger.debug(f"chat_data: {chat_data}")
+
+        cast_buffer = self.fst.take_screenshot_in_memory("cast", CORDS["CAST"])
+        cast_data = self.cast.extract_text_from_image(cast_buffer)
+        logger.debug(f"cast_data: {cast_data}")
 
         anti_buffer = self.fst.take_screenshot_in_memory("anti", CORDS["ANTI"])
         anti_data = self.anti.extract_text_from_image(anti_buffer)

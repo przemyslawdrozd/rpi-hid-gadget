@@ -16,6 +16,22 @@ class ConsoleLog:
         # Create a table with dynamic columns based on the keys in the screen_data
         table = Table(title="Aggregated Screen Data")
 
+        # Add a single row with all the values
+        row_data = []
+
+        # Add instructions at the end as a joined string
+        instructions_str = ", ".join(instructions)
+        row_data.append(instructions_str)
+
+        # Add an extra column for instructions
+        table.add_column("instructions", justify="center")
+        for value in screen_data.values():
+            if isinstance(value, dict):
+                # Add the values from the nested dictionary
+                row_data.extend([str(sub_value) for sub_value in value.values()])
+            else:
+                row_data.append(str(value))
+                
         # Add the keys from the screen_data as columns
         for key in screen_data.keys():
             if isinstance(screen_data[key], dict):
@@ -25,21 +41,7 @@ class ConsoleLog:
             else:
                 table.add_column(key, justify="center")
         
-        # Add an extra column for instructions
-        table.add_column("instructions", justify="center")
 
-        # Add a single row with all the values
-        row_data = []
-        for value in screen_data.values():
-            if isinstance(value, dict):
-                # Add the values from the nested dictionary
-                row_data.extend([str(sub_value) for sub_value in value.values()])
-            else:
-                row_data.append(str(value))
-
-        # Add instructions at the end as a joined string
-        instructions_str = ", ".join(instructions)
-        row_data.append(instructions_str)
 
         table.add_row(*row_data)
 
