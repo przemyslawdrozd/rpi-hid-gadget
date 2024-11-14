@@ -1,5 +1,6 @@
 import logging
 import argparse
+import time
 
 from ..utils.FragmentScreenTaker import FragmentScreenTaker
 from ..utils.HealthBar import HealthBar
@@ -32,63 +33,82 @@ class ScreenHandler:
         self.cp_bar = CPBar()
         self.mp_bar = MPBar()
         self.hp_bar = HPBar()
-        self.tv_reader = TVReader()
+        # self.tv_reader = TVReader()
         self.chat = ChatReader()
-        self.cast = CastReader()
-        self.anti = anti
+        # self.cast = CastReader()
+        # self.anti = anti
 
     def aggregate_screen_data(self) -> dict:
+        start_time = time.perf_counter()
+        
+        health_start = time.perf_counter()
         health_bar_buffer = self.fst.take_screenshot_in_memory("health", CORDS["HEALTH"])
         health_bar_res = self.health_bar.calculate_red_bar_percentage(health_bar_buffer)
+        health_end = time.perf_counter()
+        logger.debug(f"SCREEN Health bar processing time: {health_end - health_start:.4f} seconds")
 
-        # radar_targets_buffer = self.fst.take_screenshot_in_memory("targets", CORDS["RADAR_TARGETS"])
-        # radar_targets_image = self.radar_status.load_image(radar_targets_buffer)
-        # target_dots = self.radar_status.count_red_dots(radar_targets_image)
+        # Skipped radar processing steps, using dummy data
         target_dots = {'NE': 0, 'SE': 0, 'SW': 0, 'NW': 0}
-
-        # radar_direction_buffer = self.fst.take_screenshot_in_memory("direction", CORDS["RADAR_DIRECTIONS"])
-        # direction = self.radar_status.predict_direction_from_bytes(radar_direction_buffer)
         direction = 0
 
-        target_name_buffer = self.fst.take_screenshot_in_memory("target_name",CORDS["TARGET_NAME"])
-        target_name_res = self.target_name.extract_text_from_image(target_name_buffer)
+        # target_name_start = time.perf_counter()
+        # target_name_buffer = self.fst.take_screenshot_in_memory("target_name", CORDS["TARGET_NAME"])
+        # target_name_res = self.target_name.extract_text_from_image(target_name_buffer)
+        # target_name_end = time.perf_counter()
+        # logger.debug(f"SCREEN Target name processing time: {target_name_end - target_name_start:.4f} seconds")
 
+        cp_start = time.perf_counter()
         cp_bar_buffer = self.fst.take_screenshot_in_memory("cp", CORDS["CP_BAR"])
         cp_bar_data = self.cp_bar.calculate_percentage(cp_bar_buffer)
+        cp_end = time.perf_counter()
+        logger.debug(f"SCREEN CP bar processing time: {cp_end - cp_start:.4f} seconds")
         
+        mp_start = time.perf_counter()
         mp_bar_buffer = self.fst.take_screenshot_in_memory("mp", CORDS["MP_BAR"])
         mp_bar_data = self.mp_bar.calculate_percentage(mp_bar_buffer)
-        logger.debug(f"mp_bar_data: {mp_bar_data}")
+        mp_end = time.perf_counter()
+        logger.debug(f"SCREEN MP bar processing time: {mp_end - mp_start:.4f} seconds")
 
+        hp_start = time.perf_counter()
         hp_bar_buffer = self.fst.take_screenshot_in_memory("hp", CORDS["HP_BAR"])
         hp_bar_data = self.hp_bar.calculate_percentage(hp_bar_buffer)
-        logger.debug(f"hp_bar_data: {hp_bar_data}")
+        hp_end = time.perf_counter()
+        logger.debug(f"SCREEN HP bar processing time: {hp_end - hp_start:.4f} seconds")
 
-        tv_buffer = self.fst.take_screenshot_in_memory("tv", CORDS["TV"])
-        tv_data = self.tv_reader.extract_text_from_image(tv_buffer)
+        # tv_start = time.perf_counter()
+        # tv_buffer = self.fst.take_screenshot_in_memory("tv", CORDS["TV"])
+        # tv_data = self.tv_reader.extract_text_from_image(tv_buffer)
+        # tv_end = time.perf_counter()
+        # logger.debug(f"SCREEN TV data processing time: {tv_end - tv_start:.4f} seconds")
 
+        chat_start = time.perf_counter()
         chat_buffer = self.fst.take_screenshot_in_memory("chat", CORDS["CHAT"])
         chat_data = self.chat.extract_text_from_image(chat_buffer)
-        logger.debug(f"chat_data: {chat_data}")
+        chat_end = time.perf_counter()
+        logger.debug(f"SCREEN Chat data processing time: {chat_end - chat_start:.4f} seconds")
 
-        cast_buffer = self.fst.take_screenshot_in_memory("cast", CORDS["CAST"])
-        cast_data = self.cast.extract_text_from_image(cast_buffer)
-        logger.debug(f"cast_data: {cast_data}")
+        # anti_start = time.perf_counter()
+        # anti_buffer = self.fst.take_screenshot_in_memory("anti", CORDS["ANTI"])
+        # anti_data = self.anti.extract_text_from_image(anti_buffer)
+        # anti_end = time.perf_counter()
+        # logger.debug(f"SCREEN Anti data processing time: {anti_end - anti_start:.4f} seconds")
 
-        anti_buffer = self.fst.take_screenshot_in_memory("anti", CORDS["ANTI"])
-        anti_data = self.anti.extract_text_from_image(anti_buffer)
+        end_time = time.perf_counter()
+        logger.debug(f"SCREEN Total processing time: {end_time - start_time:.4f} seconds")
 
         return {
             "char_cp": cp_bar_data,
             "char_mp": mp_bar_data,
             "char_hp": hp_bar_data,
-            "is_tv": tv_data,
-            "is_anti": anti_data,
-            "anti counter": self.anti.anti_counter,
+            # "is_tv": tv_data,
+            "is_tv": False,
+            # "is_anti": anti_data,
+            "is_anti": False,
+            # "anti counter": self.anti.anti_counter,
             "chat": chat_data,
-            "is_cast": cast_data,
             "health_bar": health_bar_res,
-            "target_name": target_name_res,
+            # "target_name": target_name_res,
+            "target_name": "",
             "target_dots": target_dots,
             "direction": direction,
         }
