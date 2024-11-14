@@ -1,8 +1,8 @@
 import logging
-import asyncio
 from enum import Enum
 from ..consts import LOGGER_NAME
 from ..utils.ConsoleLog import ConsoleLog
+
 logger = logging.getLogger(LOGGER_NAME)
 
 class Actions(Enum):
@@ -34,16 +34,12 @@ class MageV2:
         self.found_invalid = False
 
 
-
     async def handle_mage_action(self, data: dict) -> [str]:
         try:
             self.data = data
             instructions = []
 
-
-            # await self.__apply_delay()
             match self.current_action:
-
                 case Actions.SEARCH_TARGET.value:
                     instructions = self.__handle_search()
                 case Actions.FOUND_TARGET.value:
@@ -100,16 +96,15 @@ class MageV2:
         
     def __handle_found(self):
         self.distance = self.distance + 1
+        
+        if not self.found_invalid and (self.data["chat"]["is_invalid"] or self.data["chat"]["is_cannot_see"] or self.data["chat"]["is_distance"]):
+            self.found_invalid = True
+            return ["F9"]
+        self.found_invalid = False
+        
         if self.init_hit:
             self.delay = 0.2
             self.current_action = Actions.ATTACK.value
-
-            if not self.found_invalid and (self.data["chat"]["is_invalid"] or self.data["chat"]["is_cannot_see"] or self.data["chat"]["is_distance"]):
-                self.found_invalid = True
-                return ["F9"]
-            
-            self.found_invalid = False
-
             return ["F5"]
 
         if self.data["health_bar"] < 99:
@@ -121,6 +116,12 @@ class MageV2:
 
     def __handle_attack(self):
         self.current_search = 0
+
+        if not self.found_invalid and (self.data["chat"]["is_invalid"] or self.data["chat"]["is_cannot_see"] or self.data["chat"]["is_distance"]):
+            self.found_invalid = True
+            return ["F9"]
+        self.found_invalid = False
+
         if self.data["health_bar"] < 1:
 
             # LOOT_PACE
@@ -152,7 +153,7 @@ class MageV2:
         self.__increase_attack()
 
         if self.data["char_hp"] < 100:
-            return ["F7"]
+            return ["F7", "a_down", "a_down", "a_down", "F5"]
 
         if self.current_attack == 0:
             return ["F5"]
@@ -169,11 +170,11 @@ class MageV2:
             self.current_attack =+ 1
 
 
-
     def __table_info(self, instructions: [str]) -> None:
         data = {
-            "CP / HP / MP": f"{self.data["char_cp"]} / {self.data["char_mp"]} / {self.data["char_hp"]}",
+            "CP / HP / MP": f"{self.data["char_cp"]} / {self.data["char_hp"]} /  {self.data["char_mp"]}",
             "Action": self.current_action,
+            
             # "SIT": self.rest_mode,
             # "TV": self.data["is_tv"],
             # "Anti": self.data["is_anti"],
@@ -183,6 +184,10 @@ class MageV2:
             "Distance": self.distance,
             "Searhing": self.searching,
             "Invalid": self.found_invalid,
+
+            # "D is_valid": self.data["chat"]["is_invalid"],
+            # "D is_cannot_see": self.data["chat"]["is_cannot_see"],
+            # "D is_distance": self.data["chat"]["is_distance"]
             # "T Name": self.data["target_name"],
             # "T Search": self.current_search,
             # "T Is Found": self.is_found_target,
