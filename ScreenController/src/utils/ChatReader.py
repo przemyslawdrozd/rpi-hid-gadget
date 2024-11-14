@@ -12,6 +12,7 @@ INVALID_REGEX_PATTERN = r'Invalid'
 CANNOT_REGEX_PATTERN = r'Cannot'
 DISTANCE_REGEX_PATTERN = r'distance'
 MP_REGEX_PATTERN = r'Not enough MP'
+USE_REGEX_PATTERN = r'You use'
 
 
 class ChatReader:
@@ -46,11 +47,13 @@ class ChatReader:
         cannot_matches = re.findall(CANNOT_REGEX_PATTERN, extracted_text, re.IGNORECASE)
         distance_matches = re.findall(DISTANCE_REGEX_PATTERN, extracted_text, re.IGNORECASE)
         mp_matches = re.findall(MP_REGEX_PATTERN, extracted_text, re.IGNORECASE)
+        use_matches = re.findall(USE_REGEX_PATTERN, extracted_text, re.IGNORECASE)
 
         result["is_invalid"] = len(invalid_matches) > 0
         result["is_cannot_see"] = len(cannot_matches) > 0
         result["is_distance"] = len(distance_matches) > 0
         result["is_not_mp"] = len(mp_matches) > 0
+        result["is_use"] = len(use_matches) > 0
 
 
         # if result:
