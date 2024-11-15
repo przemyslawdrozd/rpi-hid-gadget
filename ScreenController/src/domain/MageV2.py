@@ -124,8 +124,10 @@ class MageV2:
 
         if self.data["health_bar"] < 1:
 
-            # LOOT_PACE
-            self.delay = 0.7
+            # LOOT_PACE 
+            
+            # self.delay = 0.7 # Short attack
+            self.delay = 2.5 # Long attack
             self.current_action = Actions.LOOT.value
             return ["F9"]
 
@@ -153,7 +155,7 @@ class MageV2:
         self.__increase_attack()
 
         if self.data["char_hp"] < 100:
-            return ["F7", "a_down", "a_down", "a_down", "F5"]
+            return ["F7", "a_down", "F5"]
 
         if self.current_attack == 0:
             return ["F5"]
