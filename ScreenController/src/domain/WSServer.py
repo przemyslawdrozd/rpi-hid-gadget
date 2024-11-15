@@ -8,6 +8,8 @@ from ..consts import LOGGER_NAME
 PORT = 8765
 HOST = "0.0.0.0"
 
+DELAY = 0.2
+
 logger = logging.getLogger(LOGGER_NAME)
 
 
@@ -35,7 +37,7 @@ class WSServer:
             # Unregister the client on disconnection
             self.connected_client = None
 
-    async def broadcast_message(self, instructions):
+    async def broadcast_message(self, instructions, delay):
         """Broadcast a periodic message to the connected client."""
         # while True:
         if self.connected_client:  # If there's a connected client
@@ -44,6 +46,8 @@ class WSServer:
             except websockets.exceptions.ConnectionClosed:
                 logger.error("WS failed to broadcast_message")
                 self.connected_client = None
+        await asyncio.sleep(delay)
+
 
     async def start_server(self):
         """Start the WebSocket server."""

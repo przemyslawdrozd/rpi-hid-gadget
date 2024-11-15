@@ -4,6 +4,7 @@ HID_KEY_MAP = {
     "Release": (NULL_CHAR * 8),
     "Space": (NULL_CHAR * 2 + chr(44) + NULL_CHAR * 5),
     "Enter": (NULL_CHAR * 2 + chr(40) + NULL_CHAR * 5),
+    "Esc": (NULL_CHAR * 2 + chr(41) + NULL_CHAR * 5),
 
     "a": (NULL_CHAR * 2 + chr(4) + NULL_CHAR * 5),
     "b": (NULL_CHAR * 2 + chr(5) + NULL_CHAR * 5),

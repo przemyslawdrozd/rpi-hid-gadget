@@ -10,7 +10,7 @@ from ..consts import LOGGER_NAME
 logger = logging.getLogger(LOGGER_NAME)
 
 REGEX_PATTERN = r'anti(\w+(:\s?\w)?)?'
-PROCESS_TIME_IS_SEC = 15
+PROCESS_TIME_IS_SEC = 10
 
 class Anti:
 

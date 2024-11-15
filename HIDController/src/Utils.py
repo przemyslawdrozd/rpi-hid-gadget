@@ -27,17 +27,18 @@ class Utils:
                 logger.debug("Found arrow up/down sleep 1 sec..")
                 await asyncio.sleep(1)
 
-            await Utils.write_report("Release")
+            await Utils.write_report(Utils.get_report_value("Release"))
             await Utils.random_sleep()
 
         logger.debug("Release..")
-        await Utils.write_report("Release")
+        await Utils.write_report(Utils.get_report_value("Release"))
 
     @staticmethod
     async def write_report(report: str) -> None:
         """Asynchronously write the given value into serial port"""
         async with aiofiles.open(SERIAL_PORT, "rb+") as fd:
             await fd.write(report.encode())
+            await asyncio.sleep(0.01)
 
     @staticmethod
     def get_report_value(char: str):
