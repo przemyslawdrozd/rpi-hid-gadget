@@ -29,10 +29,13 @@ class MageV2:
         self.init_hit = False
         self.attack_threshold = 1
         self.current_attack = 0
+        self.count_hits = 0
 
         self.step = False
         self.found_invalid = False
 
+        self.rest_mode = False
+        self.hp_on_rest = 0
 
     async def handle_mage_action(self, data: dict) -> [str]:
         try:
@@ -48,6 +51,8 @@ class MageV2:
                     instructions = self.__handle_attack()
                 case Actions.LOOT.value:
                     instructions = self.__handle_loot()
+                case Actions.REGEN.value:
+                    instructions = self.__handle_regen()
 
             if len(instructions) == 0:
                 instructions = ["Esc"]
@@ -71,7 +76,7 @@ class MageV2:
         if self.data["health_bar"] > 99:
             self.delay = 0.8
             self.current_action = Actions.FOUND_TARGET.value
-            return ["F5"] 
+            return self.__return_attack()
         
         self.delay = 0.5
         if self.current_search == 0:
@@ -96,6 +101,7 @@ class MageV2:
         
     def __handle_found(self):
         self.distance = self.distance + 1
+        self.delay = 0.2
         
         if not self.found_invalid and (self.data["chat"]["is_invalid"] or self.data["chat"]["is_cannot_see"] or self.data["chat"]["is_distance"]):
             self.found_invalid = True
@@ -103,19 +109,21 @@ class MageV2:
         self.found_invalid = False
         
         if self.init_hit:
-            self.delay = 0.2
             self.current_action = Actions.ATTACK.value
-            return ["F5"]
+            return self.__return_attack()
 
         if self.data["health_bar"] < 99:
             self.current_action = Actions.SEARCH_TARGET.value
+            # return ["Esc", "Release"] # Use when single targate around
             return ["Release"]
 
         self.init_hit = self.data["chat"]["is_use"]
-        return ["F5"]
+        return self.__return_attack()
 
     def __handle_attack(self):
+        self.delay = 0.5
         self.current_search = 0
+        self.count_hits = self.count_hits + 1
 
         if not self.found_invalid and (self.data["chat"]["is_invalid"] or self.data["chat"]["is_cannot_see"] or self.data["chat"]["is_distance"]):
             self.found_invalid = True
@@ -123,11 +131,9 @@ class MageV2:
         self.found_invalid = False
 
         if self.data["health_bar"] < 1:
-
             # LOOT_PACE 
-            
-            # self.delay = 0.7 # Short attack
-            self.delay = 2.5 # Long attack
+            self.delay = 0.7 # Short attack
+            # self.delay = 2.0 # Long attack
             self.current_action = Actions.LOOT.value
             return ["F9"]
 
@@ -135,13 +141,40 @@ class MageV2:
     
     def __handle_loot(self):
         self.searching = 0
+        self.count_hits = 0
         self.current_attack = 0
         self.init_hit = False
         self.step = True
-        self.delay = 0
+        self.delay = 1
+
+        # Comment to disable REGEN
+        # if self.data["char_mp"] < 1:
+        #     self.current_action = Actions.REGEN.value
+        #     return ["F10", "F10", "F10", "F10", "a_down"]
+
         self.current_action = Actions.SEARCH_TARGET.value
         return ["F10","F10","F10","F10","F10"]
 
+    def __handle_regen(self):
+        self.delay = 2.5
+        if self.data["char_mp"] < 1 and not self.rest_mode:     
+            self.rest_mode = True
+            self.hp_on_rest = self.data["char_hp"]
+            return ["F11", "Release"]
+
+        if self.rest_mode and self.data["char_mp"] > 99:
+            self.rest_mode = False
+            self.delay = 0.5
+            self.current_action = Actions.SEARCH_TARGET.value
+            return ["F11", "Release"]
+
+        if self.data["char_hp"] < self.hp_on_rest:
+            self.rest_mode = False
+            self.current_action = Actions.ATTACK.value
+            self.delay = 0.5
+            return ["F1", "F7"]
+
+        return ["Release"]
 
     def __increase_search(self):
         if self.current_search == self.search_threashold:
@@ -155,6 +188,7 @@ class MageV2:
         self.__increase_attack()
 
         if self.data["char_hp"] < 100:
+            self.delay = 1.5
             return ["F7", "a_down", "F5"]
 
         if self.current_attack == 0:
@@ -185,11 +219,14 @@ class MageV2:
             "delay": self.delay,
             "Distance": self.distance,
             "Searhing": self.searching,
+            "Hits": self.count_hits,
             "Invalid": self.found_invalid,
+            
 
             # "D is_valid": self.data["chat"]["is_invalid"],
             # "D is_cannot_see": self.data["chat"]["is_cannot_see"],
-            # "D is_distance": self.data["chat"]["is_distance"]
+            # "D is_distance": self.data["chat"]["is_distance"],
+            "D is_use": self.data["chat"]["is_use"]
             # "T Name": self.data["target_name"],
             # "T Search": self.current_search,
             # "T Is Found": self.is_found_target,

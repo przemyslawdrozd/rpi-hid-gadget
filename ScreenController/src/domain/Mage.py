@@ -24,6 +24,7 @@ class Mage:
 
         self.rest_mode = False
         self.fast_loot = False
+        self.hp_on_rest = 0
 
         self.found_invalid = False
 
@@ -54,7 +55,9 @@ class Mage:
         if not self.is_found_target:
             return self.find_target()
 
-        attack_res = self.__first_attack()
+        attack_res = None
+        if not self.is_try_attack:
+            attack_res = self.__first_attack()
         
         if attack_res is not None:
             return attack_res
@@ -68,15 +71,10 @@ class Mage:
             return self.find_target()
         
         self.fast_loot = True
-        self.delay = 0.2
-        if self.current_attack == 0:
-                return ["F5"]
-        if self.current_attack == 1:
-                return ["F6"]
-        if self.current_attack == 2:
-                return ["F7"]
-        
-        return ["F5"]
+        self.delay = 0.5
+
+        return self.return_attack()
+       
 
     def __loot(self):
         self.is_try_attack = False
@@ -90,21 +88,21 @@ class Mage:
         return ["F4"]
 
     def __first_attack(self):
-        self.__increase_attack()
         if self.data['target_name'] != "" and self.data["health_bar"] > 99:
-            self.delay = 0.5
             self.is_try_attack = True
-            self.current_search = 0
+            # self.current_search = 1
             self.try_count = self.try_count + 1
+            self.delay = 0.3
             
             if not self.found_invalid and (self.data["chat"]["is_invalid"] or self.data["chat"]["is_cannot_see"] or self.data["chat"]["is_distance"]):
                 self.found_invalid = True
                 return ["F9"]
 
             self.found_invalid = False
-            if self.data["char_hp"] < 1:
+            if self.data["char_hp"] < 100:
                 return ["F7"]
-            return ["F5"]
+            
+            return self.return_attack()
 
         self.try_count = 0
         return None
@@ -112,6 +110,7 @@ class Mage:
     def __apply_is_rest_needed(self):
         if self.data["char_mp"] < 1 and not self.rest_mode:
             self.rest_mode = True
+            self.hp_on_rest = self.data["char_hp"]
             return ["F11", "Release"]
         
         if self.rest_mode and self.data["char_mp"] > 98:
@@ -119,11 +118,14 @@ class Mage:
             self.delay = 0.5
             return ["F11", "Release"]
         
+        if self.data["char_hp"] < self.hp_on_rest:
+            self.rest_mode = False
+            return ["F1", "F7"]
+
         return ["Release"]
 
-
     def find_target(self):
-        self.delay = 0.2
+        self.delay = 0.3
         
         if self.data['target_name'] != "" and self.data["health_bar"] > 99:
             self.is_found_target = True
@@ -131,17 +133,19 @@ class Mage:
 
         if self.current_search == 0:
             self.__increase_seach()
-            return ["F1", "F5", "Release"]
+            hit = "F5"
+            if self.data["char_hp"] < 100:
+                hit = ["F7"]
+            return ["F1", hit]
         
         if self.current_search == 1:
             self.__increase_seach()
-            return ["F2", "F2", "Release"]
+            return ["F2"]
         
         if self.current_search == 2:
             self.__increase_seach()
-            return ["F3", "F3", "Release"]
+            return ["F3"]
         
-    
     def __increase_seach(self):
         if self.current_search == self.search_threashold:
             self.current_search = 0
@@ -163,25 +167,37 @@ class Mage:
         await asyncio.sleep(self.delay)
         self.delay = 0
 
+    def return_attack(self):
+        self.__increase_attack()
+        if self.current_attack == 0:
+            return ["F5"]
+        if self.current_attack == 1:
+            return ["F6"]
+        if self.current_attack == 2:
+            return ["F7"]
+        
+        return ["F5"]
+
+
 
     def __table_info(self, instructions):
         data = {
-            # "CP": self.data["char_cp"],
-            "MP": self.data["char_mp"],
-            "HP": self.data["char_hp"],
-            # "SIT": self.rest_mode,
-            # "TV": self.data["is_tv"],
-            # "Anti": self.data["is_anti"],
+            "CP / HP / MP": f"{self.data["char_cp"]} / {self.data["char_mp"]} / {self.data["char_hp"]}",
+            "SIT": self.rest_mode,
+            "TV": self.data["is_tv"],
+            "Anti": self.data["is_anti"],
             
             "T HP": self.data["health_bar"],
             "T Name": self.data["target_name"],
             "T Search": self.current_search,
             "T Is Found": self.is_found_target,
-            "T Is Invalid": self.found_invalid,
+            "Invalid": self.found_invalid,
+            
+            "Spell": self.current_attack,
             "Try Attack": self.is_try_attack,
             "Init Attack": self.data["is_cast"],
             "Fast Loot": self.fast_loot,
-            "Count before hit": self.try_count,
+            "Count hits": self.try_count,
             "delay": self.delay,
             
         }
