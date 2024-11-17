@@ -60,7 +60,7 @@ class HIDMapper:
                 return ["Esc", "Release"]
             # return ["F2", "F2", "F4"]
             # Spider
-            # return ["F1", "F2", "F1", "F2", "F1", "F2", "F3"]
+            return ["F1", "F2", "F1", "F2", "F1", "F2", "F3"], 0
 
             # Academy
             return ["F2", "F4"]

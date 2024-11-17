@@ -2,8 +2,11 @@ import logging
 from enum import Enum
 from ..consts import LOGGER_NAME
 from ..utils.ConsoleLog import ConsoleLog
+from datetime import datetime, timedelta
+import time
 
 logger = logging.getLogger(LOGGER_NAME)
+
 
 class Actions(Enum):
     SEARCH_TARGET = "SEARCH"
@@ -17,6 +20,11 @@ class MageV2:
         self.cl = ConsoleLog()
         self.data = []
         self.delay = 0
+        
+        self.start_at = None
+        self.start_time = None
+        self.working_time = None
+        self.start_timer()
 
         self.current_action = Actions.SEARCH_TARGET.value
 
@@ -54,9 +62,16 @@ class MageV2:
                 case Actions.REGEN.value:
                     instructions = self.__handle_regen()
 
-            if len(instructions) == 0:
-                instructions = ["Esc"]
+            # instructions.append("F4")
 
+
+
+            logger.debug(f"instructions: {instructions}")
+
+            if data["char_cp"] < 100:
+                instructions = ["Release"]
+
+            self.update_working_time()
             self.__table_info(instructions)
             return instructions, self.delay
         
@@ -71,7 +86,7 @@ class MageV2:
         if self.step and self.searching == 5:
             self.step = False
             self.delay = 1
-            return ["a_down"]
+            return ["a_up"]
 
         if self.data["health_bar"] > 99:
             self.delay = 0.8
@@ -86,13 +101,15 @@ class MageV2:
             if self.first_search:
                 hit = "F5"
                 if self.data["char_hp"] < 100:
-                    hit = ["F7"]
-            return ["F1", hit]
+                    hit = "F7"
+            return ["F1"]
         
         self.first_search = False
 
         if self.current_search == 1:
             self.__increase_search()
+            if not self.data["chat"]["is_use"]:
+                return ["Esc", "F2"]
             return ["F2"]
         
         if self.current_search == 2:
@@ -132,9 +149,11 @@ class MageV2:
 
         if self.data["health_bar"] < 1:
             # LOOT_PACE 
-            self.delay = 0.7 # Short attack
+            self.delay = 0.1 # Short attack
             # self.delay = 2.0 # Long attack
             self.current_action = Actions.LOOT.value
+
+            # self.current_action = Actions.SEARCH_TARGET.value
             return ["F9"]
 
         return self.__return_attack()
@@ -145,7 +164,7 @@ class MageV2:
         self.current_attack = 0
         self.init_hit = False
         self.step = True
-        self.delay = 1
+        self.delay = 0.5
 
         # Comment to disable REGEN
         # if self.data["char_mp"] < 1:
@@ -153,7 +172,7 @@ class MageV2:
         #     return ["F10", "F10", "F10", "F10", "a_down"]
 
         self.current_action = Actions.SEARCH_TARGET.value
-        return ["F10","F10","F10","F10","F10"]
+        return ["F10","F10"]
 
     def __handle_regen(self):
         self.delay = 2.5
@@ -189,7 +208,7 @@ class MageV2:
 
         if self.data["char_hp"] < 100:
             self.delay = 1.5
-            return ["F7", "a_down", "F5"]
+            return ["F7", "F5"]
 
         if self.current_attack == 0:
             return ["F5"]
@@ -205,9 +224,17 @@ class MageV2:
         else:
             self.current_attack =+ 1
 
+    def format_seconds_to_hhmmss(self, seconds = 0):
+        # Convert the float seconds to an integer for whole seconds
+        seconds = int(seconds)
+        # Use timedelta to format seconds into HH:MM:SS
+        formatted_time = str(timedelta(seconds=seconds))
+        return formatted_time
 
     def __table_info(self, instructions: [str]) -> None:
         data = {
+            "StartedAt": self.start_at,
+            "Working:": self.format_seconds_to_hhmmss(self.working_time),
             "CP / HP / MP": f"{self.data["char_cp"]} / {self.data["char_hp"]} /  {self.data["char_mp"]}",
             "Action": self.current_action,
             
@@ -226,7 +253,7 @@ class MageV2:
             # "D is_valid": self.data["chat"]["is_invalid"],
             # "D is_cannot_see": self.data["chat"]["is_cannot_see"],
             # "D is_distance": self.data["chat"]["is_distance"],
-            "D is_use": self.data["chat"]["is_use"]
+            # "D is_use": self.data["chat"]["is_use"]
             # "T Name": self.data["target_name"],
             # "T Search": self.current_search,
             # "T Is Found": self.is_found_target,
@@ -241,3 +268,19 @@ class MageV2:
         }
 
         self.cl.log(data, instructions)
+
+    def start_timer(self):
+        # Record the start time as a formatted string
+        self.start_at = datetime.now().strftime("%H:%M:%S")
+        self.start_time = time.time()  # Record the start time in seconds for calculation
+        print(f"Timer started at: {self.start_at}")
+
+    def update_working_time(self):
+        # Calculate the working time
+        if self.start_time:
+            elapsed_time = time.time() - self.start_time
+            self.working_time = elapsed_time  # Keep it as a float for calculations
+            formatted_working_time = str(timedelta(seconds=int(elapsed_time)))  # Format for display
+            print(f"Working time: {formatted_working_time}")
+        else:
+            print("Timer has not been started.")
