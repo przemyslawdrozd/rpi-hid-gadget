@@ -1,9 +1,16 @@
 import logging
+import random
+import argparse
+
 from enum import Enum
 from ..consts import LOGGER_NAME
 from ..utils.ConsoleLog import ConsoleLog
+from datetime import datetime, timedelta
+from ..utils.HPAlarm import HPAlarm
+import time
 
 logger = logging.getLogger(LOGGER_NAME)
+
 
 class Actions(Enum):
     SEARCH_TARGET = "SEARCH"
@@ -13,13 +20,21 @@ class Actions(Enum):
     REGEN = "REGEN"
 
 class MageV2:
-    def __init__(self):
+    def __init__(self, args: argparse.Namespace):
         self.cl = ConsoleLog()
+        self.alarm = HPAlarm()
+        self.args = args
         self.data = []
         self.delay = 0
+        
+        self.start_at = None
+        self.start_time = None
+        self.working_time = None
+        self.start_timer()
 
         self.current_action = Actions.SEARCH_TARGET.value
 
+        self.count_search = 0
         self.current_search = 0
         self.search_threashold = 2
         self.first_search = True
@@ -31,14 +46,13 @@ class MageV2:
         self.current_attack = 0
         self.count_hits = 0
 
-        self.step = False
         self.found_invalid = False
-
         self.rest_mode = False
         self.hp_on_rest = 0
 
     async def handle_mage_action(self, data: dict) -> [str]:
         try:
+
             self.data = data
             instructions = []
 
@@ -54,24 +68,29 @@ class MageV2:
                 case Actions.REGEN.value:
                     instructions = self.__handle_regen()
 
-            if len(instructions) == 0:
-                instructions = ["Esc"]
+            logger.debug(f"instructions: {instructions}")
 
+            if data["char_cp"] < 100 or data["is_anti"]:
+                instructions = ["Release"]
+                self.delay = 10
+
+            self.update_working_time()
             self.__table_info(instructions)
+            self.__alert()
             return instructions, self.delay
         
         except Exception as e:
             logger.error(f"handle_mage_action error: {e}", exc_info=True)
-            return ["Release"]
+            return ["Release"], 10
 
     def __handle_search(self):
         self.distance = 0
         self.searching += 1
 
-        if self.step and self.searching == 5:
-            self.step = False
+        if self.searching % 5 == 0:
+            self.count_search = self.count_search + 1
             self.delay = 1
-            return ["a_down"]
+            return [self.__move()]
 
         if self.data["health_bar"] > 99:
             self.delay = 0.8
@@ -81,18 +100,14 @@ class MageV2:
         self.delay = 0.5
         if self.current_search == 0:
             self.__increase_search()
-
-            hit = "Release"
-            if self.first_search:
-                hit = "F5"
-                if self.data["char_hp"] < 100:
-                    hit = ["F7"]
-            return ["F1", hit]
+            return ["F1"]
         
         self.first_search = False
 
         if self.current_search == 1:
             self.__increase_search()
+            if not self.data["chat"]["is_use"]:
+                return ["Esc", "F2"]
             return ["F2"]
         
         if self.current_search == 2:
@@ -100,8 +115,9 @@ class MageV2:
             return ["F3"]
         
     def __handle_found(self):
+        self.searching = 0
         self.distance = self.distance + 1
-        self.delay = 0.2
+        self.delay = 0
         
         if not self.found_invalid and (self.data["chat"]["is_invalid"] or self.data["chat"]["is_cannot_see"] or self.data["chat"]["is_distance"]):
             self.found_invalid = True
@@ -115,7 +131,7 @@ class MageV2:
         if self.data["health_bar"] < 99:
             self.current_action = Actions.SEARCH_TARGET.value
             # return ["Esc", "Release"] # Use when single targate around
-            return ["Release"]
+            return ["Esc", self.__move()]
 
         self.init_hit = self.data["chat"]["is_use"]
         return self.__return_attack()
@@ -132,20 +148,20 @@ class MageV2:
 
         if self.data["health_bar"] < 1:
             # LOOT_PACE 
-            self.delay = 0.7 # Short attack
+            self.delay = 0.1 # Short attack
             # self.delay = 2.0 # Long attack
             self.current_action = Actions.LOOT.value
+
+            # self.current_action = Actions.SEARCH_TARGET.value
             return ["F9"]
 
         return self.__return_attack()
     
     def __handle_loot(self):
-        self.searching = 0
         self.count_hits = 0
         self.current_attack = 0
         self.init_hit = False
-        self.step = True
-        self.delay = 1
+        self.delay = 0.5
 
         # Comment to disable REGEN
         # if self.data["char_mp"] < 1:
@@ -153,7 +169,7 @@ class MageV2:
         #     return ["F10", "F10", "F10", "F10", "a_down"]
 
         self.current_action = Actions.SEARCH_TARGET.value
-        return ["F10","F10","F10","F10","F10"]
+        return ["F10","F10", "F10", "F10"]
 
     def __handle_regen(self):
         self.delay = 2.5
@@ -189,7 +205,7 @@ class MageV2:
 
         if self.data["char_hp"] < 100:
             self.delay = 1.5
-            return ["F7", "a_down", "F5"]
+            return ["F7", "F5"]
 
         if self.current_attack == 0:
             return ["F5"]
@@ -198,6 +214,8 @@ class MageV2:
         
         return ["F5"]
     
+    def __move(self):
+        return random.choice(["a_down", "a_up"])
 
     def __increase_attack(self):
         if self.current_attack == self.attack_threshold:
@@ -205,9 +223,18 @@ class MageV2:
         else:
             self.current_attack =+ 1
 
+    def format_seconds_to_hhmmss(self, seconds = 0):
+        # Convert the float seconds to an integer for whole seconds
+        seconds = int(seconds)
+        # Use timedelta to format seconds into HH:MM:SS
+        formatted_time = str(timedelta(seconds=seconds))
+        return formatted_time
 
     def __table_info(self, instructions: [str]) -> None:
         data = {
+            "StartedAt": self.start_at,
+            "Working:": self.format_seconds_to_hhmmss(self.working_time),
+            "Anti": self.data["is_anti"] if self.args.anti else "Off",
             "CP / HP / MP": f"{self.data["char_cp"]} / {self.data["char_hp"]} /  {self.data["char_mp"]}",
             "Action": self.current_action,
             
@@ -226,7 +253,7 @@ class MageV2:
             # "D is_valid": self.data["chat"]["is_invalid"],
             # "D is_cannot_see": self.data["chat"]["is_cannot_see"],
             # "D is_distance": self.data["chat"]["is_distance"],
-            "D is_use": self.data["chat"]["is_use"]
+            # "D is_use": self.data["chat"]["is_use"]
             # "T Name": self.data["target_name"],
             # "T Search": self.current_search,
             # "T Is Found": self.is_found_target,
@@ -241,3 +268,24 @@ class MageV2:
         }
 
         self.cl.log(data, instructions)
+
+    def __alert(self) -> None:
+        if self.data["char_hp"] < 100:
+            self.alarm.invoke_alert()
+
+
+    def start_timer(self):
+        # Record the start time as a formatted string
+        self.start_at = datetime.now().strftime("%H:%M:%S")
+        self.start_time = time.time()  # Record the start time in seconds for calculation
+        print(f"Timer started at: {self.start_at}")
+
+    def update_working_time(self):
+        # Calculate the working time
+        if self.start_time:
+            elapsed_time = time.time() - self.start_time
+            self.working_time = elapsed_time  # Keep it as a float for calculations
+            formatted_working_time = str(timedelta(seconds=int(elapsed_time)))  # Format for display
+            print(f"Working time: {formatted_working_time}")
+        else:
+            print("Timer has not been started.")
