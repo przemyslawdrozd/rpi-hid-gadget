@@ -1,5 +1,7 @@
 import logging
 import random
+import argparse
+
 from enum import Enum
 from ..consts import LOGGER_NAME
 from ..utils.ConsoleLog import ConsoleLog
@@ -17,8 +19,9 @@ class Actions(Enum):
     REGEN = "REGEN"
 
 class MageV2:
-    def __init__(self):
+    def __init__(self, args: argparse.Namespace):
         self.cl = ConsoleLog()
+        self.args = args
         self.data = []
         self.delay = 0
         
@@ -47,6 +50,7 @@ class MageV2:
 
     async def handle_mage_action(self, data: dict) -> [str]:
         try:
+
             self.data = data
             instructions = []
 
@@ -64,7 +68,7 @@ class MageV2:
 
             logger.debug(f"instructions: {instructions}")
 
-            if data["char_cp"] < 100:
+            if data["char_cp"] < 100 or data["is_anti"]:
                 instructions = ["Release"]
 
             self.update_working_time()
@@ -226,6 +230,7 @@ class MageV2:
         data = {
             "StartedAt": self.start_at,
             "Working:": self.format_seconds_to_hhmmss(self.working_time),
+            "Anti": self.data["is_anti"] if self.args.anti else "Off",
             "CP / HP / MP": f"{self.data["char_cp"]} / {self.data["char_hp"]} /  {self.data["char_mp"]}",
             "Action": self.current_action,
             

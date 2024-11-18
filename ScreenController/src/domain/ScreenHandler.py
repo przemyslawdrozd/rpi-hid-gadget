@@ -28,7 +28,7 @@ class ScreenHandler:
         self.args = args
         self.fst = FragmentScreenTaker(args)
         self.health_bar = HealthBar()
-        self.radar_status = RadarStatus()
+        # self.radar_status = RadarStatus()
         self.target_name = TargetName()
         self.cp_bar = CPBar()
         self.mp_bar = MPBar()
@@ -36,7 +36,7 @@ class ScreenHandler:
         # self.tv_reader = TVReader()
         self.chat = ChatReader()
         # self.cast = CastReader()
-        # self.anti = anti
+        self.anti = anti
 
     def aggregate_screen_data(self) -> dict:
         start_time = time.perf_counter()
@@ -87,11 +87,14 @@ class ScreenHandler:
         chat_end = time.perf_counter()
         logger.debug(f"SCREEN Chat data processing time: {chat_end - chat_start:.4f} seconds")
 
-        # anti_start = time.perf_counter()
-        # anti_buffer = self.fst.take_screenshot_in_memory("anti", CORDS["ANTI"])
-        # anti_data = self.anti.extract_text_from_image(anti_buffer)
-        # anti_end = time.perf_counter()
-        # logger.debug(f"SCREEN Anti data processing time: {anti_end - anti_start:.4f} seconds")
+        if self.args.anti:
+            anti_start = time.perf_counter()
+            anti_buffer = self.fst.take_screenshot_in_memory("anti", CORDS["ANTI"])
+            anti_data = self.anti.extract_text_from_image(anti_buffer)
+            anti_end = time.perf_counter()
+            logger.debug(f"SCREEN Anti data processing time: {anti_end - anti_start:.4f} seconds")
+        else:
+            anti_data = False
 
         end_time = time.perf_counter()
         logger.debug(f"SCREEN Total processing time: {end_time - start_time:.4f} seconds")
@@ -102,8 +105,8 @@ class ScreenHandler:
             "char_hp": hp_bar_data,
             # "is_tv": tv_data,
             "is_tv": False,
-            # "is_anti": anti_data,
-            "is_anti": False,
+            "is_anti": anti_data,
+            # "is_anti": False,
             # "anti counter": self.anti.anti_counter,
             "chat": chat_data,
             "health_bar": health_bar_res,

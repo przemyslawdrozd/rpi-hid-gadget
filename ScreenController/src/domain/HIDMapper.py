@@ -23,7 +23,7 @@ class HIDMapper:
     def __init__(self, anti: Anti, args: argparse.Namespace):
         self.active_skill = ActiveSkill()
         self.mage = Mage()
-        self.magev2 = MageV2()
+        self.magev2 = MageV2(args)
         self.anti = anti
         self.history = []
         self.args = args
@@ -36,8 +36,8 @@ class HIDMapper:
     async def generate_instructions(self, data) -> [str]:
         self.history.insert(0, data)
 
-        if data["is_anti"]:
-            return self.anti.handle_action()
+        # if data["is_anti"]:
+        #     return self.anti.handle_action()
 
         if data["is_tv"]:
             return ["Release"]
@@ -46,8 +46,8 @@ class HIDMapper:
         if self.__handle_own_name(data):
             return ["Release"]
         
-        if data["char_cp"] < 100:
-            return ["Release"], 10
+        # if data["char_cp"] < 100:
+        #     return ["Release"], 10
         
         if self.args.mage:
             # return await self.mage.handle_mage_action(data)
