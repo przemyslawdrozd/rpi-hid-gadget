@@ -6,6 +6,7 @@ from enum import Enum
 from ..consts import LOGGER_NAME
 from ..utils.ConsoleLog import ConsoleLog
 from datetime import datetime, timedelta
+from ..utils.HPAlarm import HPAlarm
 import time
 
 logger = logging.getLogger(LOGGER_NAME)
@@ -21,6 +22,7 @@ class Actions(Enum):
 class MageV2:
     def __init__(self, args: argparse.Namespace):
         self.cl = ConsoleLog()
+        self.alarm = HPAlarm()
         self.args = args
         self.data = []
         self.delay = 0
@@ -70,9 +72,11 @@ class MageV2:
 
             if data["char_cp"] < 100 or data["is_anti"]:
                 instructions = ["Release"]
+                self.delay = 10
 
             self.update_working_time()
             self.__table_info(instructions)
+            self.__alert()
             return instructions, self.delay
         
         except Exception as e:
@@ -264,6 +268,11 @@ class MageV2:
         }
 
         self.cl.log(data, instructions)
+
+    def __alert(self) -> None:
+        if self.data["char_hp"] < 100:
+            self.alarm.invoke_alert()
+
 
     def start_timer(self):
         # Record the start time as a formatted string
