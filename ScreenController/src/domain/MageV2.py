@@ -34,7 +34,6 @@ class MageV2:
 
         self.current_action = Actions.SEARCH_TARGET.value
 
-        self.count_search = 0
         self.current_search = 0
         self.search_threashold = 2
         self.first_search = True
@@ -87,12 +86,11 @@ class MageV2:
         self.distance = 0
         self.searching += 1
 
-        if self.searching % 5 == 0:
-            self.count_search = self.count_search + 1
-            self.delay = 1
+        if self.searching % 3 == 0:
+            self.delay = 3
             return [self.__move()]
 
-        if self.data["health_bar"] > 99:
+        if self.data["health_bar"] > 0:
             self.delay = 0.8
             self.current_action = Actions.FOUND_TARGET.value
             return self.__return_attack()
@@ -106,7 +104,7 @@ class MageV2:
 
         if self.current_search == 1:
             self.__increase_search()
-            if not self.data["chat"]["is_use"]:
+            if not self.__init_hit():
                 return ["Esc", "F2"]
             return ["F2"]
         
@@ -124,17 +122,23 @@ class MageV2:
             return ["F9"]
         self.found_invalid = False
         
+
+        if self.data["health_bar"] < 99 and not self.__init_hit():
+            self.current_action = Actions.SEARCH_TARGET.value
+            # return ["Esc", "Release"] # Use when single targate around
+            return ["Esc", self.__move()]
+        
+        self.init_hit = self.__init_hit()
         if self.init_hit:
             self.current_action = Actions.ATTACK.value
             return self.__return_attack()
 
-        if self.data["health_bar"] < 99:
-            self.current_action = Actions.SEARCH_TARGET.value
-            # return ["Esc", "Release"] # Use when single targate around
-            return ["Esc", self.__move()]
-
-        self.init_hit = self.data["chat"]["is_use"]
         return self.__return_attack()
+
+    def __init_hit(self):
+        if self.data["chat"]["is_use"] or self.data["chat"]["is_att"]:
+            return True
+        return False
 
     def __handle_attack(self):
         self.delay = 0.5
@@ -161,7 +165,7 @@ class MageV2:
         self.count_hits = 0
         self.current_attack = 0
         self.init_hit = False
-        self.delay = 0.5
+        self.delay = 1.5
 
         # Comment to disable REGEN
         # if self.data["char_mp"] < 1:
@@ -169,7 +173,7 @@ class MageV2:
         #     return ["F10", "F10", "F10", "F10", "a_down"]
 
         self.current_action = Actions.SEARCH_TARGET.value
-        return ["F10","F10", "F10", "F10"]
+        return ["F10","F10", "F10", "F10", "F10"]
 
     def __handle_regen(self):
         self.delay = 2.5
@@ -205,7 +209,7 @@ class MageV2:
 
         if self.data["char_hp"] < 100:
             self.delay = 1.5
-            return ["F7", "F5"]
+            return ["F7"]
 
         if self.current_attack == 0:
             return ["F5"]
@@ -215,7 +219,8 @@ class MageV2:
         return ["F5"]
     
     def __move(self):
-        return random.choice(["a_down", "a_up"])
+        # return random.choice(["a_down", "a_up"])
+        return random.choice(["a_down"])
 
     def __increase_attack(self):
         if self.current_attack == self.attack_threshold:
