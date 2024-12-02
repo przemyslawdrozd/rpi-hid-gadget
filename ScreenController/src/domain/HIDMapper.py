@@ -39,8 +39,8 @@ class HIDMapper:
         # if data["is_anti"]:
         #     return self.anti.handle_action()
 
-        if data["is_tv"]:
-            return ["Release"]
+        # if data["is_tv"]:
+        #     return ["Release"]
         
         # Search for the pattern with case insensitivity
         if self.__handle_own_name(data):
