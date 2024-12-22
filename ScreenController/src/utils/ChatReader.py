@@ -14,7 +14,10 @@ DISTANCE_REGEX_PATTERN = r'distance'
 MP_REGEX_PATTERN = r'Not enough MP'
 USE_REGEX_PATTERN = r'You use'
 ATT_REGEX_PATTERN = r'cted'
-SLEEP_REGEX_PATTERN = r'Crokian'
+# SLEEP_REGEX_PATTERN = r'okian'
+# SLEEP_REGEX_PATTERN_2 = r'Stone'
+SLEEP_REGEX_PATTERN = r'andi'
+SLEEP_REGEX_PATTERN_2 = r'Gran'
 
 
 class ChatReader:
@@ -52,7 +55,9 @@ class ChatReader:
         use_matches = re.findall(USE_REGEX_PATTERN, extracted_text, re.IGNORECASE)
         att_matches = re.findall(ATT_REGEX_PATTERN, extracted_text, re.IGNORECASE)
         sleep_matches = re.findall(SLEEP_REGEX_PATTERN, extracted_text, re.IGNORECASE)
-
+        sleep_matches_2 = re.findall(SLEEP_REGEX_PATTERN_2, extracted_text, re.IGNORECASE)
+        sleep_matches.extend(sleep_matches_2)
+        
         result["is_invalid"] = len(invalid_matches) > 0
         result["is_cannot_see"] = len(cannot_matches) > 0
         result["is_distance"] = len(distance_matches) > 0
