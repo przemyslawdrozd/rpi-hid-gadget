@@ -4,11 +4,11 @@ LOG_FORMATTING = "%(asctime)s [%(levelname)s] %(message)s"
 
 HEALTH_BAR_PREFIX = 68
 CP_PREFIX = 129
-HP_PREFIX = 162
-MP_PREFIX = 101
+HP_PREFIX = 152
+MP_PREFIX = 115
 
 # Cords
-HEALTH = {"L": 775, "T": 53, "W": 360, "H": 7}
+HEALTH = {"L": 665, "T": 53, "W": 360, "H": 7}
 # RADAR_TARGETS = {"L": 1472, "T": 40, "W": 200, "H": 200}
 
 # HB
@@ -16,13 +16,15 @@ HEALTH = {"L": 775, "T": 53, "W": 360, "H": 7}
 RADAR_TARGETS = {"L": 1550, "T": 118, "W": 60, "H": 60}
 RADAR_DIRECTIONS = {"L": 1552, "T": 115, "W": 60, "H": 60}
 TARGET_NAME = {"L": 900, "T": 35, "W": 120, "H": 15}
-MP_BAR = {"L": 235, "T": 86, "W": 140, "H": 8}
-HP_BAR = {"L": 46, "T": 72, "W": 130, "H": 8}
+# MP_BAR = {"L": 235, "T": 86, "W": 140, "H": 8}
+MP_BAR = {"L": 46, "T": 86, "W": 300, "H": 8}
+# HP_BAR = {"L": 46, "T": 72, "W": 130, "H": 8}
+HP_BAR = {"L": 46, "T": 73, "W": 300, "H": 8}
 CP_BAR = {"L": 200, "T": 60, "W": 175, "H": 8}
-CHAT = {"L": 20, "T": 600, "W": 130, "H": 50}
+CHAT = {"L": 20, "T": 610, "W": 280, "H": 55}
 # CAST = {"L": 800, "T": 570, "W": 80, "H": 27}
 TV = {"L": 805, "T": 375, "W": 70, "H": 20}
-ANTI = {"L": 700, "T": 350, "W": 150, "H": 60}
+ANTI = {"L": 700, "T": 350, "W": 130, "H": 80}
 
 # Virtual
 # HEALTH = {"L": 775, "T": 53, "W": 360, "H": 7}
