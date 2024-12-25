@@ -4,6 +4,7 @@ from ..utils.Anti import Anti
 from ..utils.ActiveSkill import ActiveSkill
 from ..domain.Mage import Mage
 from ..domain.MageV2 import MageV2
+from ..domain.Recharge import Recharge
 
 DIRECTION_THRESHOLD = 40
 
@@ -24,6 +25,7 @@ class HIDMapper:
         self.active_skill = ActiveSkill()
         self.mage = Mage()
         self.magev2 = MageV2(args)
+        self.recharge = Recharge(args)
         self.anti = anti
         self.history = []
         self.args = args
@@ -54,6 +56,9 @@ class HIDMapper:
             return await self.magev2.handle_mage_action(data)
 
             return instruction
+
+        if self.args.ee:
+            return await self.recharge.handle_recharge_action(data)
 
         if self.args.ms:
             if data['target_name'] != "" and data["health_bar"] < 1:

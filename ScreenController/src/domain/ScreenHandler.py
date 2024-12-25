@@ -33,6 +33,9 @@ class ScreenHandler:
         self.cp_bar = CPBar()
         self.mp_bar = MPBar()
         self.hp_bar = HPBar()
+        self.pt_mp_bar = MPBar()
+        self.pt_hp_bar = HPBar()
+        self.member_stat = None
         # self.tv_reader = TVReader()
         self.chat = ChatReader()
         # self.cast = CastReader()
@@ -74,6 +77,19 @@ class ScreenHandler:
         hp_bar_data = self.hp_bar.calculate_percentage(hp_bar_buffer)
         hp_end = time.perf_counter()
         logger.debug(f"SCREEN HP bar processing time: {hp_end - hp_start:.4f} seconds")
+        
+        if self.args.ee:
+            pt_mp_start = time.perf_counter()
+            pt_mp_bar_buffer = self.fst.take_screenshot_in_memory("pt_mp", CORDS["PT_MP_BAR"])
+            pt_mp_bar_data = self.pt_mp_bar.calculate_percentage(pt_mp_bar_buffer)
+            pt_mp_end = time.perf_counter()
+            logger.debug(f"SCREEN MP bar processing time: {pt_mp_end - pt_mp_start:.4f} seconds")
+
+            pt_hp_start = time.perf_counter()
+            pt_hp_bar_buffer = self.fst.take_screenshot_in_memory("pt_hp", CORDS["PT_HP_BAR"])
+            pt_hp_bar_data = self.pt_hp_bar.calculate_percentage(pt_hp_bar_buffer)
+            pt_hp_end = time.perf_counter()
+            logger.debug(f"SCREEN HP bar processing time: {pt_hp_end - pt_hp_start:.4f} seconds")
 
         # tv_start = time.perf_counter()
         # tv_buffer = self.fst.take_screenshot_in_memory("tv", CORDS["TV"])
@@ -114,4 +130,6 @@ class ScreenHandler:
             "target_name": "",
             "target_dots": target_dots,
             "direction": direction,
+            "pt_mp": pt_mp_bar_data,
+            "pt_hp": pt_hp_bar_data,
         }

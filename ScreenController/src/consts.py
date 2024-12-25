@@ -26,6 +26,10 @@ CHAT = {"L": 20, "T": 610, "W": 280, "H": 55}
 TV = {"L": 805, "T": 375, "W": 70, "H": 20}
 ANTI = {"L": 700, "T": 350, "W": 130, "H": 80}
 
+PT_HP_BAR = {"L": 46, "T": 145, "W": 300, "H": 5}
+PT_MP_BAR = {"L": 46, "T": 152, "W": 300, "H": 5}
+
+
 # Virtual
 # HEALTH = {"L": 775, "T": 53, "W": 360, "H": 7}
 # RADAR_TARGETS = {"L": 1472, "T": 40, "W": 200, "H": 200}
@@ -46,5 +50,8 @@ CORDS = {
     "TV": TV,
     "ANTI": ANTI,
     "CHAT": CHAT,
+    
+    "PT_MP_BAR": PT_MP_BAR,
+    "PT_HP_BAR": PT_HP_BAR,
     # "CAST":  
 }
