@@ -4,8 +4,6 @@ LOG_FORMATTING = "%(asctime)s [%(levelname)s] %(message)s"
 
 HEALTH_BAR_PREFIX = 68
 CP_PREFIX = 129
-HP_PREFIX = 152
-MP_PREFIX = 115
 
 # Cords
 HEALTH = {"L": 665, "T": 53, "W": 360, "H": 7}
@@ -26,8 +24,8 @@ CHAT = {"L": 20, "T": 610, "W": 280, "H": 55}
 TV = {"L": 805, "T": 375, "W": 70, "H": 20}
 ANTI = {"L": 700, "T": 350, "W": 130, "H": 80}
 
-PT_HP_BAR = {"L": 46, "T": 145, "W": 300, "H": 5}
-PT_MP_BAR = {"L": 46, "T": 152, "W": 300, "H": 5}
+PT_HP_BAR = {"L": 46, "T": 140, "W": 300, "H": 5}
+PT_MP_BAR = {"L": 46, "T": 145, "W": 330, "H": 5}
 
 
 # Virtual
