@@ -5,15 +5,16 @@ import numpy as np
 from PIL import Image
 from io import BytesIO
 import pygame
-from ..consts import MP_PREFIX, LOGGER_NAME
+from ..consts import LOGGER_NAME
 
 logger = logging.getLogger(LOGGER_NAME)
 class MPBar:
-    def __init__(self):
+    def __init__(self, prefix):
         # Adjust these values to better capture your specific blue shade range
         self.lower_blue = np.array([100, 100, 100])  # Adjust hue, saturation, and value as needed
         self.upper_blue = np.array([140, 255, 255])  # Adjust upper range as needed
         # self.cp_sound_file = "files/cp.mp3"
+        self.prefix = prefix
 
         # Initialize the pygame mixer
         pygame.mixer.init()
@@ -37,7 +38,8 @@ class MPBar:
         logger.debug(f"blue_pixels: {blue_pixels}")
         total_pixels = image.shape[0] * image.shape[1]
         logger.debug(f"total_pixels: {total_pixels}")
-        percentage = int((blue_pixels / total_pixels) * MP_PREFIX)
+        # percentage = int((blue_pixels / total_pixels) * MP_PREFIX)
+        percentage = int((blue_pixels / total_pixels) * self.prefix)
         
         logger.debug(f"MP: {percentage}")
         return percentage
