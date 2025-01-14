@@ -1,5 +1,9 @@
 # Raspberry Pi HID Controller
 
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/62dbfbb6-dd93-4962-9b07-8bc77858355c" alt="rpi-hid">
+</p>
+
 This project enables a Raspberry Pi Zero to act as a Human Interface Device (HID), specifically emulating keystrokes. It can be used for various automation tasks where controlling a device via keyboard inputs is needed.
 
 ## Features
