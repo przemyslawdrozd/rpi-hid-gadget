@@ -42,7 +42,7 @@ class SCService:
         logger.debug(f"Created instructions: {instructions}")
         
         logger.debug(f"args {self.args}")
-        if not self.args.debug and not self.args.mage:
+        if not self.args.debug and not self.args.mage and not self.args.ee and not self.args.male:
             self.cl.log(screen_data, instructions)
 
         if self.args.screen:

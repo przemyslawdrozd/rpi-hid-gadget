@@ -39,6 +39,11 @@ class FragmentScreenTaker:
 
         # Measure the time after taking the screenshot
         screenshot_time = time.time()
+
+        # Enable to debug selected screenshot 
+        # if key == "chat":
+        #     screenshot.save(f"{key}-{screenshot_time}.png")
+        
         logging.info(f"Screenshot taken in {screenshot_time - start_time:.4f} seconds.")
 
         # Convert the screenshot to an in-memory object (BytesIO)

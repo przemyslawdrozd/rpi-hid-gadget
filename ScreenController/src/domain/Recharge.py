@@ -20,14 +20,13 @@ VAMP_HP = 40
 SELF_HEAL = 70 
 
 class Actions(Enum):
-    SEARCH_TARGET = "SEARCH"
-    FOUND_TARGET = "FOUND"
-    ATTACK = "ATTACK"
-    LOOT = "LOOT"
+    FOLLOW = "FOLLOW"
+    RECHARGE = "RECHARGE"
+    REST = "REST"
+    HEAL = "HEAL"
     REGEN = "REGEN"
-    REBUFF = "REBUFF"
 
-class MageV2:
+class Recharge:
     def __init__(self, args: argparse.Namespace):
         self.cl = ConsoleLog()
         self.alarm = HPAlarm()
@@ -40,12 +39,9 @@ class MageV2:
         self.working_time = None
         self.start_timer()
 
-        self.current_action = Actions.SEARCH_TARGET.value
+        self.current_action = Actions.FOLLOW.value
 
-        self.current_search = 0
-        self.search_threashold = 2
-        self.first_search = True
-        self.distance = 0
+        self.rechanrge_count = 0
         self.searching = 0
 
         self.init_hit = False
@@ -60,39 +56,33 @@ class MageV2:
         self.apply_sleep = False
         self.adjust_view = True
 
-    async def handle_mage_action(self, data: dict) -> [str]:
+    async def handle_recharge_action(self, data: dict) -> [str]:
         try:
 
             self.data = data
             instructions = []
 
             match self.current_action:
-                case Actions.SEARCH_TARGET.value:
-                    instructions = self.__handle_search()
-                case Actions.FOUND_TARGET.value:
-                    instructions = self.__handle_found()
+                case Actions.FOLLOW.value:
+                    instructions = self.__handle_follow()
                     if self.adjust_view:
                         instructions.append("pageUp")
                         self.adjust_view = False
-                case Actions.ATTACK.value:
-                    instructions = self.__handle_attack()
-                case Actions.LOOT.value:
-                    instructions = self.__handle_loot()
+                case Actions.RECHARGE.value:
+                    instructions = self.__handle_recharge()
+
                 case Actions.REGEN.value:
                     instructions = self.__handle_regen()
-                # case Actions.REBUFF.value:
-                #     instructions = self.__handle_rebuff()
 
             logger.debug(f"instructions: {instructions}")
 
-            sleep_instruction = self.__handle_sleep()
+            # sleep_instruction = self.__handle_sleep()
 
-            result = self.__reset()
-            if result is not None:
-                instructions = result
+            if self.data["pt_hp"] < 40:
+                instructions = ["F1", "F2"]
 
-            if sleep_instruction is not None:
-                instructions = sleep_instruction
+            # if sleep_instruction is not None:
+            #     instructions = sleep_instruction
 
             if data["char_cp"] < SELF_CP or data["is_anti"]:
                 instructions = ["Release"]
@@ -104,47 +94,30 @@ class MageV2:
             self.update_working_time()
             self.__table_info(instructions)
             self.__alert()
+
             return instructions, self.delay
         
         except Exception as e:
             logger.error(f"handle_mage_action error: {e}", exc_info=True)
             return ["Release"], 10
 
-    def __handle_search(self):
-        self.distance = 0
-        self.searching += 1
+    def __handle_follow(self):
+        self.delay = 1
+        self.current_action = Actions.RECHARGE.value
+        return ["F1"]
+    
+    def __handle_recharge(self):
+        self.delay = 3
+        self.current_action = Actions.FOLLOW.value
 
-        is_heal = self.__handle_heal()
-        if is_heal:
-            return is_heal
+        if self.data["char_hp"] < self.data["pt_mp"]:
+            return ["F1"]
 
-        if self.searching % 5 == 0:
-            self.delay = 1
-            return [self.__move()]
-
-        if self.data["health_bar"] > 0:
-            self.delay = 0.8
-            self.current_action = Actions.FOUND_TARGET.value
-            return self.__return_attack()
-        
-        self.delay = 0.5
-        if self.current_search == 0:
-            self.delay = 2
-            self.__increase_search()
-            return ["Esc", "F1"]
-        
-        self.first_search = False
-
-        if self.current_search == 1:
-            self.__increase_search()
-            if not self.__init_hit():
-                return ["Esc", "F2"]
-            return ["F2"]
-        
-        if self.current_search == 2:
-            self.__increase_search()
+        if self.data["pt_mp"] < 50:
             return ["F3"]
-        
+        return ["Release"]
+
+
     def __handle_found(self):
         self.searching = 0
         self.distance = self.distance + 1
@@ -190,7 +163,7 @@ class MageV2:
         if self.data["health_bar"] < 1:
             # LOOT_PACE 
             # self.delay = 0 # Short attack
-            self.delay = 2 # Long attack
+            self.delay = 4 # Long attack
             self.current_action = Actions.LOOT.value
 
             # self.current_action = Actions.SEARCH_TARGET.value
@@ -203,15 +176,15 @@ class MageV2:
         self.count_hits = 0
         self.current_attack = 0
         self.init_hit = False
-        self.delay = 2
+        self.delay = 3
 
         # Comment to disable REGEN
         if self.data["char_mp"] < START_REGEN:
             self.current_action = Actions.REGEN.value
-            return ["F10", "F10", "F10", "F10", "F4"]
+            return ["F10", "F10", "F10", "F10", "a_down"]
 
         self.current_action = Actions.SEARCH_TARGET.value
-        return ["F10", "F10", "F10", "F10", "F10", "F10", "F4"]
+        return ["F10", "F10", "F10", "F10", "F10", "F10", "F10", "F10", "F10", "a_down"]
         # return ["F10", "F10", "F10", "F10", "F10", "F10", "F10", "F10", "F10", "F10"]
 
     def __handle_regen(self):
@@ -247,9 +220,9 @@ class MageV2:
         self.__increase_attack()
 
         if self.current_action == Actions.FOUND_TARGET.value:
-            return ["F5", "F9"]
+            return ["F5"]
         
-        return ["F6", "F9"]
+        return ["F6"]
 
         if self.data["char_hp"] < VAMP_HP:
             self.delay = 1.5
@@ -313,21 +286,21 @@ class MageV2:
         data = {
             # "StartedAt": self.start_at,
             "Working:": self.format_seconds_to_hhmmss(self.working_time),
+            "Delay": self.delay,
             "Anti": self.data["is_anti"] if self.args.anti else "Off",
             "CP / HP / MP": f"{self.data["char_cp"]} / {self.data["char_hp"]} /  {self.data["char_mp"]}",
             "Action": self.current_action,
-            
+            "PT HP/MP": f"{self.data["pt_hp"]} / {self.data["pt_mp"]}",
             # "SIT": self.rest_mode,
             # "TV": self.data["is_tv"],
             # "Anti": self.data["is_anti"],
             
             "Target HP": self.data["health_bar"],
-            "Delay": self.delay,
-            "Dist": self.distance,
-            "Search": self.searching,
+            # "Dist": self.distance,
+            # "Search": self.searching,
             "Hits": self.count_hits,
-            "Invalid": self.found_invalid,
-            "Sleep": self.data["chat"]["is_sleep"],
+            # "Invalid": self.found_invalid,
+            # "Sleep": self.data["chat"]["is_sleep"],
             
 
             # "D is_valid": self.data["chat"]["is_invalid"],

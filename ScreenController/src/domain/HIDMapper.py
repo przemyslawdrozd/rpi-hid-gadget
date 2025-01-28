@@ -4,6 +4,8 @@ from ..utils.Anti import Anti
 from ..utils.ActiveSkill import ActiveSkill
 from ..domain.Mage import Mage
 from ..domain.MageV2 import MageV2
+from ..domain.Recharge import Recharge
+from ..domain.Male import Male
 
 DIRECTION_THRESHOLD = 40
 
@@ -24,6 +26,8 @@ class HIDMapper:
         self.active_skill = ActiveSkill()
         self.mage = Mage()
         self.magev2 = MageV2(args)
+        self.recharge = Recharge(args)
+        self.male = Male(args)
         self.anti = anti
         self.history = []
         self.args = args
@@ -49,11 +53,18 @@ class HIDMapper:
         # if data["char_cp"] < 100:
         #     return ["Release"], 10
         
+        if self.args.male:
+            # return await self.mage.handle_mage_action(data)
+            return await self.male.handle_male_action(data)
+        
         if self.args.mage:
             # return await self.mage.handle_mage_action(data)
             return await self.magev2.handle_mage_action(data)
 
             return instruction
+
+        if self.args.ee:
+            return await self.recharge.handle_recharge_action(data)
 
         if self.args.ms:
             if data['target_name'] != "" and data["health_bar"] < 1:
