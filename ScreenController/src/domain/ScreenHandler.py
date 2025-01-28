@@ -78,6 +78,8 @@ class ScreenHandler:
         hp_end = time.perf_counter()
         logger.debug(f"SCREEN HP bar processing time: {hp_end - hp_start:.4f} seconds")
         
+        pt_mp_bar_data = None
+        pt_hp_bar_data = None
         if self.args.ee:
             pt_mp_start = time.perf_counter()
             pt_mp_bar_buffer = self.fst.take_screenshot_in_memory("pt_mp", CORDS["PT_MP_BAR"])
