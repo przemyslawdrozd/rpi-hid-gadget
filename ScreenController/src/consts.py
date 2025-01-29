@@ -2,12 +2,12 @@ LOGGER_NAME = "ScreenController"
 LOG_FORMATTING = "%(asctime)s [%(levelname)s] %(message)s"
 
 
-HEALTH_BAR_PREFIX = 40
+HEALTH_BAR_PREFIX = 34
 CP_PREFIX = 129
 
 # Cords
 # HEALTH = {"L": 665, "T": 53, "W": 360, "H": 7}
-HEALTH = {"L": 505, "T": 705, "W": 355, "H": 5}
+HEALTH = {"L": 370, "T": 672, "W": 352, "H": 3}
 # RADAR_TARGETS = {"L": 1472, "T": 40, "W": 200, "H": 200}
 
 # HB
@@ -23,7 +23,7 @@ CP_BAR = {"L": 200, "T": 60, "W": 175, "H": 8}
 CHAT = {"L": 20, "T": 610, "W": 250, "H": 60}
 # CAST = {"L": 800, "T": 570, "W": 80, "H": 27}
 TV = {"L": 805, "T": 375, "W": 70, "H": 20}
-ANTI = {"L": 700, "T": 350, "W": 130, "H": 80}
+ANTI = {"L": 700, "T": 320, "W": 130, "H": 150}
 
 PT_HP_BAR = {"L": 46, "T": 140, "W": 300, "H": 5}
 PT_MP_BAR = {"L": 46, "T": 145, "W": 330, "H": 5}
