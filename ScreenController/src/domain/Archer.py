@@ -11,7 +11,7 @@ import time
 
 logger = logging.getLogger(LOGGER_NAME)
 
-SELF_CP = 100
+SELF_CP = 95
 
 class Actions(Enum):
     SEARCH_TARGET = "SEARCH"
@@ -35,7 +35,7 @@ class Archer:
         self.current_action = Actions.SEARCH_TARGET.value
 
         self.current_search = 0
-        self.search_threashold = 2
+        self.search_threashold = 3
         self.first_search = True
         self.distance = 0
         self.searching = 0
@@ -62,13 +62,13 @@ class Archer:
                     instructions = self.__handle_search()
                 case Actions.FOUND.value:
                     instructions = self.__handle_found()
+                    # if self.adjust_view:
+                    #     instructions.append("pageUp")
+                    #     self.adjust_view = False
                 case Actions.ATTACK.value:
                     instructions = self.__handle_attack()
                 case Actions.RE_ATTACK.value:
                     instructions = self.__handle_re_attack()
-                    # if self.adjust_view:
-                    #     instructions.append("pageUp")
-                    #     self.adjust_view = False
 
             logger.debug(f"instructions: {instructions}")
 
@@ -91,21 +91,21 @@ class Archer:
         self.count_hits = 0
         self.searching += 1
         self.adjust_view = True
+        self.delay = 0.2
 
         if self.searching % 15 == 0:
             self.delay = 1
             return ["Esc", self.__move()]
 
         if self.data["health_bar"] > 95:
-            self.delay = 0.8
+            self.delay = 0.5
             self.current_action = Actions.FOUND.value
             return ["F5"]
         
-        self.delay = 0.5
         if self.current_search == 0:
             # self.delay = 2
             self.__increase_search()
-            return ["F1"]
+            return ["Esc", "F1", "F9"]
         
         self.first_search = False
 
@@ -116,6 +116,10 @@ class Archer:
         if self.current_search == 2:
             self.__increase_search()
             return ["F3"]
+        
+        if self.current_search == 3:
+            self.__increase_search()
+            return ["F4"]
         
 
         if self.data["health_bar"] < 95 and not self.__init_hit():
@@ -135,7 +139,10 @@ class Archer:
         if self.data["health_bar"] < 100:
             self.current_action = Actions.ATTACK.value
 
-        if self.distance == 10:
+
+        if self.distance == 3:
+            self.distance = 0
+            self.current_action = Actions.SEARCH_TARGET.value
             return ["Esc", "F1"]
 
         return ["F5"]
@@ -146,7 +153,8 @@ class Archer:
         return False
 
     def __handle_attack(self):
-        self.delay = 1
+        # self.delay = 0.5
+        self.distance = 0
         self.current_search = 0
         self.searching = 0
         self.count_hits = self.count_hits + 1
@@ -157,8 +165,8 @@ class Archer:
             return ["F5"]
         self.found_invalid = False
 
-        if self.data["health_bar"] < 5:        
-            self.delay = 1
+        if self.data["health_bar"] < 1:        
+            self.delay = 0.5
             self.current_action = Actions.RE_ATTACK.value
 
             return ["F1"]
@@ -167,7 +175,7 @@ class Archer:
     
 
     def __handle_re_attack(self):
-        self.delay = 1
+        self.delay = 0.5
         if self.data["health_bar"] > 0:
             self.current_action = Actions.ATTACK.value
             return ["F5"]
@@ -188,11 +196,24 @@ class Archer:
 
         if self.current_action == Actions.SEARCH_TARGET.value:
             return ["F5"]
+
         
+        if self.data["health_bar"] > 80:
+            return ["F5"]
+        
+        if self.data["health_bar"] > 40:
+            return ["F5"]
+
+        if self.data["health_bar"] < 30:
+            return ["F6", "F5"]
+
+
+
         return ["F5"]
-    
     def __move(self):
-        return random.choice([ "Release", "a_down", "a_up", "Release", "Release"])
+        return random.choice(["Release"])
+        # return random.choice(["a_down", "Release", "a_up"])
+        return random.choice([ "Release", "a_up", "Release", "Release"])
 
     def __increase_attack(self):
         if self.current_attack == self.attack_threshold:
@@ -245,7 +266,7 @@ class Archer:
         self.cl.log(data, instructions)
 
     def __alert(self) -> None:
-        if self.data["char_hp"] < 50:
+        if self.data["char_hp"] < 60:
             self.alarm.invoke_alert()
 
 

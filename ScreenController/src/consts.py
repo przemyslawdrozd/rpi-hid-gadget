@@ -2,12 +2,12 @@ LOGGER_NAME = "ScreenController"
 LOG_FORMATTING = "%(asctime)s [%(levelname)s] %(message)s"
 
 
-HEALTH_BAR_PREFIX = 34
-CP_PREFIX = 129
+HEALTH_BAR_PREFIX = 29
+CP_PREFIX = 130
 
 # Cords
 # HEALTH = {"L": 665, "T": 53, "W": 360, "H": 7}
-HEALTH = {"L": 370, "T": 672, "W": 352, "H": 3}
+HEALTH = {"L": 369, "T": 678, "W": 352, "H": 6}
 # RADAR_TARGETS = {"L": 1472, "T": 40, "W": 200, "H": 200}
 
 # HB
