@@ -46,4 +46,7 @@ class HealthBar:
         # Calculate the percentage of red pixels
         approx_percentage = (red_pixels / bar_width) * HEALTH_BAR_PREFIX
 
+        if red_pixels < 50:
+            return 0
+
         return int(approx_percentage)

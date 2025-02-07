@@ -47,6 +47,7 @@ def main():
     parser.add_argument("-ms", action="store_true", help="Run in mage short mode")
     parser.add_argument("-mage", action="store_true", help="Run in mage general mode")
     parser.add_argument("-male", action="store_true", help="Run in mage general mode")
+    parser.add_argument("-arch", action="store_true", help="Run in archer boot mode")
     parser.add_argument("-ee", action="store_true", help="Run in mage general mode")
     parser.add_argument("-anti", action="store_true", help="Enable anti mode")
 
