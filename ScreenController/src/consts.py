@@ -3,7 +3,7 @@ LOG_FORMATTING = "%(asctime)s [%(levelname)s] %(message)s"
 
 
 HEALTH_BAR_PREFIX = 29
-CP_PREFIX = 130
+CP_PREFIX = 131
 
 # Cords
 # HEALTH = {"L": 665, "T": 53, "W": 360, "H": 7}

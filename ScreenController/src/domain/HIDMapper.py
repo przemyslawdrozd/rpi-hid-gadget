@@ -7,6 +7,7 @@ from ..domain.MageV2 import MageV2
 from ..domain.Recharge import Recharge
 from ..domain.Male import Male
 from ..domain.Archer import Archer
+from ..domain.Spoil import Spoil
 
 DIRECTION_THRESHOLD = 40
 
@@ -30,6 +31,7 @@ class HIDMapper:
         self.recharge = Recharge(args)
         self.male = Male(args)
         self.arch = Archer(args)
+        self.spoil = Spoil(args)
         self.anti = anti
         self.history = []
         self.args = args
@@ -58,6 +60,10 @@ class HIDMapper:
         if self.args.male:
             # return await self.mage.handle_mage_action(data)
             return await self.male.handle_male_action(data)
+       
+        if self.args.spoil:
+            # return await self.mage.handle_mage_action(data)
+            return await self.spoil.handle_spoil_action(data)
         
         if self.args.arch:
             # return await self.mage.handle_mage_action(data)
