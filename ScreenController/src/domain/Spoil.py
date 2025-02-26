@@ -75,6 +75,13 @@ class Spoil:
 
             logger.debug(f"instructions: {instructions}")
 
+            if self.is_stuck():
+                instructions = ["Esc", "F10"]
+
+            if self.data["chat"]["is_cannot_see"]:
+                self.delay = 5
+                instructions = ["Esc", self.__move(), "F10", "F6"]
+
             if data["char_cp"] < SELF_CP or data["is_anti"]:
                 instructions = ["Release"]
                 self.delay = 3
@@ -155,11 +162,13 @@ class Spoil:
     def __handle_attack(self):
         # self.delay = 0.5
         self.distance = 0
-
+        self.adjust_view = True
         # too go around
         self.current_search = 0
         self.searching = 0
-        self.count_hits = self.count_hits + 1
+
+        if self.data["health_bar"] > 99:   
+            self.count_hits = self.count_hits + 1
 
         # if not self.found_invalid and (self.data["chat"]["is_invalid"] or self.data["chat"]["is_cannot_see"] or self.data["chat"]["is_distance"]):
         #     self.found_invalid = True
@@ -168,14 +177,14 @@ class Spoil:
         # self.found_invalid = False
 
         if self.data["health_bar"] < 1:        
-            self.delay = 0.2
+            self.delay = 0.5
             self.count_hits = 0
             self.current_action = Actions.RE_ATTACK.value
             # self.current_action = Actions.RE_ATTACK.value
             self.is_killed = True
-            if random.random() > 0.75:
-                return ["F7", "F7", "F10", "F1", "F6"]
-            return ["F7", "F7", "F9", "F1", "F6"]
+            if random.random() > 0.85:
+                return ["F7", "F7", "F10", "F1"]
+            return ["F7", "F7", "F9", "F1"]
 
         return self.__return_attack()
     
@@ -206,19 +215,22 @@ class Spoil:
         self.delay = 0.8
         self.__increase_attack()
 
-        if self.count_hits > 10:
+        if self.count_hits > 5:
             self.count_hits = 0
-            return ["Esc", "F2"]
+            return ["Esc", "a_up", "F10"]
 
         if self.data["health_bar"] > 95:
             return ["F6"]
 
-        return ["F6", "F5"]
+        if self.data["health_bar"] < 30:
+            return ["F6", "F5"]
+        
+        return ["F6"]
     
 
     def __move(self):
-        return random.choice(["Release"])
-        # return random.choice(["a_down", "Release", "a_up"])
+        # return random.choice(["Release"])
+        return random.choice(["a_down", "Release", "a_up"])
         return random.choice([ "Release", "a_up", "Release", "Release"])
 
     def __increase_attack(self):
@@ -253,7 +265,7 @@ class Spoil:
             "Hits": self.count_hits,
 
             # "D is_valid": self.data["chat"]["is_invalid"],
-            # "D is_cannot_see": self.data["chat"]["is_cannot_see"],
+            "D is_cannot_see": self.data["chat"]["is_cannot_see"],
             # "D is_distance": self.data["chat"]["is_distance"],
             # "D is_use": self.data["chat"]["is_use"]
             # "T Name": self.data["target_name"],
@@ -275,6 +287,14 @@ class Spoil:
         if self.data["char_hp"] < 60:
             self.alarm.invoke_alert()
 
+    def is_stuck(self) -> bool:
+        threashold = 10
+        if self.distance > threashold or self.searching > threashold or self.count_hits > threashold:
+            self.distance = 0
+            self.searching = 0
+            self.count_hits = 0
+            return True
+        return False
 
     def start_timer(self):
         # Record the start time as a formatted string
