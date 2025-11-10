@@ -35,7 +35,7 @@ class Archer:
         self.current_action = Actions.SEARCH_TARGET.value
 
         self.current_search = 0
-        self.search_threashold = 2
+        self.search_threashold = 3
         self.first_search = True
         self.distance = 0
         self.searching = 0
@@ -62,15 +62,20 @@ class Archer:
                     instructions = self.__handle_search()
                 case Actions.FOUND.value:
                     instructions = self.__handle_found()
-                    if self.adjust_view:
-                        instructions.append("pageUp")
-                        self.adjust_view = False
+                    # if self.adjust_view:
+                    #     instructions.append("pageUp")
+                    #     self.adjust_view = False
                 case Actions.ATTACK.value:
                     instructions = self.__handle_attack()
                 case Actions.RE_ATTACK.value:
                     instructions = self.__handle_re_attack()
 
             logger.debug(f"instructions: {instructions}")
+
+            if self.is_stuck():
+                self.current_action = Actions.SEARCH_TARGET.value
+                instructions = ["Esc", "F10", "F1"]
+
 
             if data["char_cp"] < SELF_CP or data["is_anti"]:
                 instructions = ["Release"]
@@ -79,6 +84,7 @@ class Archer:
             self.update_working_time()
             self.__table_info(instructions)
             self.__alert()
+            # return ["F12"], 3
             return instructions, self.delay
         
         except Exception as e:
@@ -91,7 +97,7 @@ class Archer:
         self.count_hits = 0
         self.searching += 1
         self.adjust_view = True
-        self.delay = 0.3
+        self.delay = 0.4
 
         if self.searching % 10 == 0:
             self.delay = 1
@@ -119,7 +125,10 @@ class Archer:
         
         if self.current_search == 3:
             self.__increase_search()
-            return ["F4"]
+            if random.random() > 0.5:   
+                return ["F4"]
+            else:
+                return ["F12"]
         
 
         # if self.data["health_bar"] < 95 and not self.__init_hit():
@@ -169,7 +178,7 @@ class Archer:
             self.delay = 0.5
             self.current_action = Actions.RE_ATTACK.value
 
-            return ["F1"]
+            return ["F10", "F1"]
 
         return self.__return_attack()
     
@@ -202,12 +211,10 @@ class Archer:
             return ["F5"]
         
         if self.data["health_bar"] > 40:
-            return ["F5", "a_down"]
+            return ["F5"]
 
-        if self.data["health_bar"] < 30:
+        if self.data["health_bar"] < 15:
             return ["F6", "F5"]
-
-
 
         return ["F5"]
     def __move(self):
@@ -220,6 +227,20 @@ class Archer:
             self.current_attack = 0
         else:
             self.current_attack =+ 1
+
+    def is_stuck(self) -> bool:
+        threashold = 3
+        if self.distance > threashold or self.searching > threashold:
+            self.distance = 0
+            self.searching = 0
+            self.count_hits = 0
+            return True
+        
+        if self.count_hits > 2 and self.data["health_bar"] > 99:
+            return True
+        
+        return False
+
 
     def format_seconds_to_hhmmss(self, seconds = 0):
         # Convert the float seconds to an integer for whole seconds

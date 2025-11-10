@@ -7,7 +7,7 @@ CP_PREFIX = 131
 
 # Cords
 # HEALTH = {"L": 665, "T": 53, "W": 360, "H": 7}
-HEALTH = {"L": 369, "T": 678, "W": 352, "H": 6}
+HEALTH = {"L": 369, "T": 700, "W": 352, "H": 30}
 # RADAR_TARGETS = {"L": 1472, "T": 40, "W": 200, "H": 200}
 
 # HB

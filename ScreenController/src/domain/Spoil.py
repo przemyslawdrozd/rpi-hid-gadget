@@ -12,12 +12,16 @@ import time
 logger = logging.getLogger(LOGGER_NAME)
 
 SELF_CP = 98
+START_REGEN = 20
+END_REGEN = 60
 
 class Actions(Enum):
     SEARCH_TARGET = "SEARCH"
     FOUND = "FOUND"
     ATTACK = "ATTACK"
     RE_ATTACK = "RE_ATTACK"
+    # REGEN = "REGEN"
+
 
 class Spoil:
     def __init__(self, args: argparse.Namespace):
@@ -65,31 +69,37 @@ class Spoil:
                     instructions = self.__handle_search()
                 case Actions.FOUND.value:
                     instructions = self.__handle_found()
-                    # if self.adjust_view:
-                    #     instructions.append("pageUp")
-                    #     self.adjust_view = False
+                    if self.adjust_view:
+                        instructions.append("pageUp")
+                        self.adjust_view = False
                 case Actions.ATTACK.value:
                     instructions = self.__handle_attack()
                 case Actions.RE_ATTACK.value:
                     instructions = self.__handle_re_attack()
+                # case Actions.REGEN.value:
+                #     instructions = self.__handle_regen()
 
             logger.debug(f"instructions: {instructions}")
 
             if self.is_stuck():
                 instructions = ["Esc", "F10"]
 
-            if self.data["chat"]["is_cannot_see"]:
-                self.delay = 5
-                instructions = ["Esc", self.__move(), "F10", "F6"]
+            # if self.data["char_hp"] < 40:
+            #     instructions.append("F12")
+
+            # if self.data["chat"]["is_cannot_see"]:
+            #     self.delay = 8
+            #     instructions = ["Esc", self.__move(), "F10", "F6"]
 
             if data["char_cp"] < SELF_CP or data["is_anti"]:
+                # instructions = ["Release", "Enter"]
                 instructions = ["Release"]
                 self.delay = 3
 
             self.update_working_time()
             self.__table_info(instructions)
             self.__alert()
-            # return ["F12"], 1
+            # return ["F1", "F2", "F3", "F4", "F5", "F6","F7", "F8", "F9", "F10", "F11", "F12", ], 2
             return instructions, self.delay
         
         except Exception as e:
@@ -104,11 +114,17 @@ class Spoil:
         self.adjust_view = True
         self.delay = 0.3
 
+        # Comment to disable REGEN
+        # if self.data["char_mp"] < START_REGEN:
+        #     self.hp_on_rest = self.data["char_hp"] - 2
+        #     self.current_action = Actions.REGEN.value
+        #     return ["F10", "F10", "Esc"]
+
         if self.searching % 15 == 0:
             self.delay = 1
             return ["Esc", self.__move()]
 
-        if self.data["health_bar"] > 95:
+        if self.data["health_bar"] > 90:
             self.delay = 0.5
             self.current_action = Actions.FOUND.value
             return ["F6"]
@@ -116,21 +132,21 @@ class Spoil:
         if self.current_search == 0:
             # self.delay = 2
             self.__increase_search()
-            return ["F1", "F7"]
+            return ["F1", "F7", "F10"]
         
         self.first_search = False
 
         if self.current_search == 1:
             self.__increase_search()
-            return ["F2"]
+            return ["F2", "F10"]
         
         if self.current_search == 2:
             self.__increase_search()
-            return ["F3"]
+            return ["F3", "F10"]
         
         if self.current_search == 3:
             self.__increase_search()
-            return ["F4"]
+            return ["F4", "F10"]
         
 
         if self.data["health_bar"] < 95 and not self.__init_hit():
@@ -145,14 +161,14 @@ class Spoil:
         return self.__return_attack()
     
     def __handle_found(self):
-        self.delay = 1
+        self.delay = 2.5
         self.distance = self.distance + 1
 
         if self.data["health_bar"] < 100:
             self.current_action = Actions.ATTACK.value
             return ["F6", "F5"]
 
-        return ["F6"]
+        return ["F6", "F5"]
 
     def __init_hit(self):
         if self.data["chat"]["is_use"] or self.data["chat"]["is_att"]:
@@ -177,14 +193,15 @@ class Spoil:
         # self.found_invalid = False
 
         if self.data["health_bar"] < 1:        
-            self.delay = 0.5
+            self.delay = 2.2
             self.count_hits = 0
             self.current_action = Actions.RE_ATTACK.value
             # self.current_action = Actions.RE_ATTACK.value
             self.is_killed = True
-            if random.random() > 0.85:
-                return ["F7", "F7", "F10", "F1"]
-            return ["F7", "F7", "F9", "F1"]
+            # return ["F7", "F7", "F10", "F1"]
+            # if random.random() > 0.85:
+            #     return ["F7", "F7", "F10", "F1"]
+            return ["F7","F10", "F8", "F7", "F10", "F10", "F10", "F10", "F7", "F1", "F5"]
 
         return self.__return_attack()
     
@@ -215,15 +232,18 @@ class Spoil:
         self.delay = 0.8
         self.__increase_attack()
 
-        if self.count_hits > 5:
-            self.count_hits = 0
-            return ["Esc", "a_up", "F10"]
+        # if self.count_hits > 9:
+        #     self.count_hits = 0
+        #     return ["Esc", "a_up", "F10"]
 
         if self.data["health_bar"] > 95:
             return ["F6"]
 
-        if self.data["health_bar"] < 30:
-            return ["F6", "F5"]
+        # if self.data["health_bar"] < 55 and self.data["health_bar"] > 40:
+        #     return ["F5", "F8"]
+        
+        if self.data["health_bar"] < 55:
+            return ["F5"]
         
         return ["F6"]
     
@@ -253,6 +273,7 @@ class Spoil:
             "Delay": self.delay,
             "Anti": self.data["is_anti"] if self.args.anti else "Off",
             "CP / HP / MP": f"{self.data["char_cp"]} / {self.data["char_hp"]} /  {self.data["char_mp"]}",
+            "Rest HP": self.hp_on_rest,
             "Action": self.current_action,
             
             # "SIT": self.rest_mode,
@@ -265,7 +286,7 @@ class Spoil:
             "Hits": self.count_hits,
 
             # "D is_valid": self.data["chat"]["is_invalid"],
-            "D is_cannot_see": self.data["chat"]["is_cannot_see"],
+            # "D is_cannot_see": self.data["chat"]["is_cannot_see"],
             # "D is_distance": self.data["chat"]["is_distance"],
             # "D is_use": self.data["chat"]["is_use"]
             # "T Name": self.data["target_name"],
@@ -283,12 +304,34 @@ class Spoil:
 
         self.cl.log(data, instructions)
 
+    def __handle_regen(self):
+        self.delay = 2
+        if self.data["char_hp"] < self.hp_on_rest:
+            self.rest_mode = False
+            self.current_action = Actions.ATTACK.value
+            self.delay = 0.5
+            return ["F1", "F5"]
+        
+        if self.data["char_mp"] < START_REGEN + 1 and not self.rest_mode:     
+            self.hp_on_rest = self.data["char_hp"] - 2
+            self.rest_mode = True
+            return ["F11", "Release"]
+
+        if self.data["char_mp"] >= END_REGEN:
+            self.rest_mode = False
+            self.delay = 0.5
+            self.current_action = Actions.SEARCH_TARGET.value
+            return ["F11", "Release"]
+
+        self.hp_on_rest = self.data["char_hp"] - 2
+        return ["Release"]
+    
     def __alert(self) -> None:
-        if self.data["char_hp"] < 60:
+        if self.data["char_hp"] < 30:
             self.alarm.invoke_alert()
 
     def is_stuck(self) -> bool:
-        threashold = 10
+        threashold = 15
         if self.distance > threashold or self.searching > threashold or self.count_hits > threashold:
             self.distance = 0
             self.searching = 0
