@@ -1,6 +1,7 @@
 import logging
 import random
 import argparse
+import math
 
 from enum import Enum
 from ..consts import LOGGER_NAME
@@ -57,7 +58,7 @@ class Spoil:
 
         self.adjust_view = True
 
-    async def handle_spoil_action(self, data: dict) -> [str]:
+    async def handle_spoil_action(self, data: dict) -> tuple[list[str], float]:
         try:
 
             self.data = data
@@ -97,6 +98,11 @@ class Spoil:
                 self.delay = 3
 
             self.update_working_time()
+
+            # instr, delay = self.wc_assist()
+            # self.__table_info(instr)
+            # return instr, delay
+            
             self.__table_info(instructions)
             self.__alert()
             # return ["F1", "F2", "F3", "F4", "F5", "F6","F7", "F8", "F9", "F10", "F11", "F12", ], 2
@@ -105,6 +111,79 @@ class Spoil:
         except Exception as e:
             logger.error(f"handle_mage_action error: {e}", exc_info=True)
             return ["Release"], 10
+
+    def wc_assist(self):
+        DELAY = 2
+        BUFF_TO_CAST = ["F9", "F10", "F11"]
+        FULL_BUFF_ROUND = 19  # in minutes
+        # MODULO_CAST is in minutes: how often (minutes) we advance to the next buff slot
+        # compute minutes per buff slot; floor as requested and ensure at least 1 minute
+        MODULO_CAST = max(1, math.floor(FULL_BUFF_ROUND / len(BUFF_TO_CAST)))
+
+
+        stanrdard_instructions = [
+            "F5", # target
+            "F6", # assist
+            "F7", # attack
+        ]
+
+        def current_buff():
+            """Return the index into BUFF_TO_CAST based on working_time.
+
+            working_time is stored in seconds. MODULO_CAST is expressed in minutes
+            and represents how many minutes pass before moving to the next buff index.
+
+            Logic:
+            - If working_time is None or BUFF_TO_CAST is empty -> return 0
+            - Convert working_time to minutes, compute which slot we're in by
+              floor(elapsed_minutes / MODULO_CAST), then mod by buff length.
+            """
+            if not self.working_time:
+                # no working time yet -> start from first buff
+                logger.debug("working_time not set, defaulting current_buff index to 0")
+                return 0
+
+            # convert seconds to minutes
+            elapsed_minutes = float(self.working_time) / 60.0
+
+            # number of completed "slots" since start
+            try:
+                slots = int(elapsed_minutes // MODULO_CAST)
+            except Exception:
+                slots = 0
+
+            index = slots % len(BUFF_TO_CAST)
+            return index
+
+        # compute and log current buff index + name for debugging
+        idx = current_buff()
+        buff_name = BUFF_TO_CAST[idx] if BUFF_TO_CAST else None
+        # logger.info(f"Current buff index: {idx}, buff: {buff_name}, Working time (s): {self.working_time}, modulo_min: {MODULO_CAST}")
+
+        # append the current buff key to the returned instruction list once per slot
+        instructions = list(stanrdard_instructions)
+
+        if BUFF_TO_CAST:
+            # track last buff index sent so we only append once per modulo slot
+            last_idx_attr = "_last_buff_idx"
+            last_idx = getattr(self, last_idx_attr, None)
+
+            if last_idx is None or last_idx != idx:
+                # append the actual buff key (e.g. "F10") instead of the numeric index
+                instructions.append(buff_name)
+                setattr(self, last_idx_attr, idx)
+                # logger.info(f"Appending buff {buff_name} (idx {idx}) to instructions")
+            # else:
+            #     logger.debug(f"Buff {buff_name} (idx {idx}) already sent for current slot; skipping append")
+
+        # If character HP is low, append heal key at the end of instructions
+        if int(self.data.get("char_hp", 100)) < 50:
+            instructions.append("F1") # heal
+
+        res = instructions, DELAY
+        # logger.info(f"WC Assist Instructions: {res}")
+        return res
+
 
     def __handle_search(self):
         self.delay = 1
@@ -243,7 +322,7 @@ class Spoil:
         #     return ["F5", "F8"]
         
         if self.data["health_bar"] < 55:
-            return ["F5"]
+            return ["F5", "F10", "F10"]
         
         return ["F6"]
     
@@ -266,7 +345,7 @@ class Spoil:
         formatted_time = str(timedelta(seconds=seconds))
         return formatted_time
 
-    def __table_info(self, instructions: [str]) -> None:
+    def __table_info(self, instructions: list[str]) -> None:
         data = {
             # "StartedAt": self.start_at,
             "Working:": self.format_seconds_to_hhmmss(self.working_time),
